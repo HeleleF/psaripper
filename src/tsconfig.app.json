@@ -8,7 +8,8 @@
   },
   "include": [
     "main.ts",
-    "polyfill.ts"
+    "polyfill.ts",
+    "src/app/shared/*.ts"
   ],
   "exclude": [
     "**/*.spec.ts"

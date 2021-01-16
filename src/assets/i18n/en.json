@@ -1,12 +1,20 @@
 {
   "PAGES": {
-      "HOME": {
-          "TITLE": "App works !",
-          "GO_TO_DETAIL": "Go to Detail"
-      },
-      "DETAIL": {
-        "TITLE": "Detail page !",
-        "BACK_TO_HOME": "Back to Home"
+    "HOME": {
+      "TITLE": "App works !",
+      "GO_TO_DETAIL": "Go to Detail"
+    },
+    "DETAIL": {
+      "TITLE": "Detail page !",
+      "BACK_TO_HOME": "Back to Home"
+    },
+    "NOTFOUND": {
+      "TITLE": "not found page !",
+      "BACK_TO_HOME": "Back to Home"
+    },
+    "PSA": {
+      "TITLE": "psa medium page !",
+      "BACK_TO_HOME": "Back to Home"
     }
   }
 }

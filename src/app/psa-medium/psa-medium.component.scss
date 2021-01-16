@@ -1,0 +1,65 @@
+
+  
+  .medium-article {
+  
+    width: 25%;
+
+    margin: auto;
+  }
+   
+  .medium-title {
+  
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 20px;
+    line-height: 1.5em;
+  }
+  
+  .medium-title-link {
+    text-decoration: none;
+    color: white;
+  }
+  
+  .medium-thumb {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  
+  .medium-thumb-container {
+    margin-bottom: 1em;
+    transition: all .5s ease;
+    cursor: pointer;
+  }
+  
+  .medium-thumb-container:hover {
+    filter: brightness(80%);
+  }
+  
+  .medium-meta {
+  
+    text-transform: uppercase;
+    font-size: .875em;
+    font-weight: 400;
+  }
+  
+  .medium-caption {
+  
+    color: #006621;
+  }
+  
+  .medium-categories {
+  
+    color: #3b8dbd;
+    margin-bottom: .3em;
+  }
+  
+  .medium-excerpt {
+  
+    color: #aaa;
+  
+    font-size: 1em;
+    line-height: 1.6em;
+    text-align: justify;
+  }

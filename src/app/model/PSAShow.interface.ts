@@ -1,0 +1,9 @@
+import { PSAShowRelease } from './PSAShowRelease.interface';
+
+export interface PSAShow {
+  name: string;
+  thumbnail: string;
+  content: string;
+  categories: string[];
+  releases: PSAShowRelease[];
+}

@@ -1,13 +1,47 @@
-[![Angular Logo](https://www.vectorlogo.zone/logos/angular/angular-icon.svg)](https://angular.io/) [![Electron Logo](https://www.vectorlogo.zone/logos/electronjs/electronjs-icon.svg)](https://electronjs.org/)
+### PSA Ripper
 
-![Maintained][maintained-badge]
-[![Travis Build Status][build-badge]][build]
-[![Make a pull request][prs-badge]][prs]
-[![License](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENSE.md)
+hier kommt mein gedöns rein
 
-[![Watch on GitHub][github-watch-badge]][github-watch]
-[![Star on GitHub][github-star-badge]][github-star]
-[![Tweet][twitter-badge]][twitter]
+# ELECTRON ENTRY POINT
+
+This is the main entry point for electron.
+Meaning, to start it manually, you would call `npx electron mainElectron.js`.
+
+The default way from the template repo was to use the `main.js` file directly.
+But since we're using modules here, this fails.
+
+### What to do when electron supports ES modules as entry point?
+
+1. Change field main in `package.json` back to simply `'main.js'`
+2. Change scripts in `package.json` to `electron .` instead of `electron ./mainElectron.js` (works since electron looks for `main.js` by default)
+3. Remove esm (`npm uninstall esm`)
+4. Remove this file
+
+### Why does it fail?
+
+Electron does not support ES modules as the main entry point file.
+The issue that tracks this seems to be [here](https://github.com/electron/electron/issues/21457).
+
+### The problem is:
+
+1. `main.js` (compiled from `main.ts`) contains the *new* import statements.
+2. Electron fails with `'SyntaxError: Cannot use import statement outside a module'`
+3. To fix this, one can change `main.js` to `main.mjs` OR adding `type: 'module'` in `package.json`. (Both solutions mark the js file as a ES module).
+4. Now electron fails again with: `'Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: .\main.js'`
+5. As long as electron doesnt change its internal requiring code to use import(), using ES modules will therefore fail.
+
+### Solutions:
+
+- One could change the typescript target back to `es5`, which converts the import statements, therefore resolving the error. (`main.js` is then not a ES module anymore)
+
+- Another way is described [here](https://github.com/electron/electron/issues/21457#issuecomment-703298653)
+
+We create another file (this one) to act as the new entry point. As can be seen below, we have no import statement here, making this a commonjs file.
+The esm package (`npm install esm`) loads our ACTUAL entry point logic and exports it again.
+
+This way we can have a fancy ES module as entry point to electron.
+
+### Created from template:
 
 # Introduction
 
@@ -28,30 +62,6 @@ With this sample, you can :
 /!\ Hot reload only pertains to the renderer process. The main electron process is not able to be hot reloaded, only restarted.
 
 /!\ Angular 11.x CLI needs Node 10.13 or later to work correctly.
-
-## Getting Started
-
-Clone this repository locally :
-
-``` bash
-git clone https://github.com/maximegris/angular-electron.git
-```
-
-Install dependencies with npm :
-
-``` bash
-npm install
-```
-
-There is an issue with `yarn` and `node_modules` when the application is built by the packager. Please use `npm` as dependencies manager.
-
-
-If you want to generate Angular components with Angular-cli , you **MUST** install `@angular/cli` in npm global context.
-Please follow [Angular-cli documentation](https://github.com/angular/angular-cli) if you had installed a previous version of `angular-cli`.
-
-``` bash
-npm install -g @angular/cli
-```
 
 ## To build for development
 
@@ -86,39 +96,3 @@ Maybe you only want to execute the application in the browser with hot reload ? 
 ## You want to use a specific lib (like rxjs) in electron main thread ?
 
 YES! You can do it! Just by importing your library in npm dependencies section (not **devDependencies**) with `npm install --save`. It will be loaded by electron during build phase and added to your final package. Then use your library by importing it in `main.ts` file. Quite simple, isn't it ?
-
-## E2E Testing
-
-E2E Test scripts can be found in `e2e` folder.
-
-|Command|Description|
-|--|--|
-|`npm run e2e`| Execute end to end tests |
-
-Note: To make it work behind a proxy, you can add this proxy exception in your terminal  
-`export {no_proxy,NO_PROXY}="127.0.0.1,localhost"`
-
-## Branch & Packages version
-
-- Angular 4 & Electron 1 : Branch [angular4](https://github.com/maximegris/angular-electron/tree/angular4)
-- Angular 5 & Electron 1 : Branch [angular5](https://github.com/maximegris/angular-electron/tree/angular5)
-- Angular 6 & Electron 3 : Branch [angular6](https://github.com/maximegris/angular-electron/tree/angular6)
-- Angular 7 & Electron 3 : Branch [angular7](https://github.com/maximegris/angular-electron/tree/angular7)
-- Angular 8 & Electron 7 : Branch [angular8](https://github.com/maximegris/angular-electron/tree/angular8)
-- Angular 9 & Electron 7 : Branch [angular9](https://github.com/maximegris/angular-electron/tree/angular9)
-- Angular 10 & Electron 9 : Branch [angular10](https://github.com/maximegris/angular-electron/tree/angular9)
-- Angular 11 & Electron 10 : (master)
-
-[build-badge]: https://travis-ci.org/maximegris/angular-electron.svg?branch=master&style=style=flat-square
-[build]: https://travis-ci.org/maximegris/angular-electron
-[license-badge]: https://img.shields.io/badge/license-Apache2-blue.svg?style=style=flat-square
-[license]: https://github.com/maximegris/angular-electron/blob/master/LICENSE.md
-[prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
-[prs]: http://makeapullrequest.com
-[github-watch-badge]: https://img.shields.io/github/watchers/maximegris/angular-electron.svg?style=social
-[github-watch]: https://github.com/maximegris/angular-electron/watchers
-[github-star-badge]: https://img.shields.io/github/stars/maximegris/angular-electron.svg?style=social
-[github-star]: https://github.com/maximegris/angular-electron/stargazers
-[twitter]: https://twitter.com/intent/tweet?text=Check%20out%20angular-electron!%20https://github.com/maximegris/angular-electron%20%F0%9F%91%8D
-[twitter-badge]: https://img.shields.io/twitter/url/https/github.com/maximegris/angular-electron.svg?style=social
-[maintained-badge]: https://img.shields.io/badge/maintained-yes-brightgreen

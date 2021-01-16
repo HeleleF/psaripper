@@ -1,3 +1,19 @@
-:host {
+.expanded-toolbar {
+
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    position: relative;
+
+    height: 50px;
+
+    background-color: #26272b;
+  }
   
-}
+  .toolbar-spacer {
+    flex: 1 1 auto;
+  }
+
+  .home-button, .menu-button {
+    color: white;
+  }

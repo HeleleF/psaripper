@@ -1,0 +1,13 @@
+<div class="medium-article">
+  <div class="medium-thumb-container">
+    <h2 class="medium-title">
+      <p class="medium-title-link" title="{{content.name}}">{{content.name}}</p>
+    </h2>
+    <p class="medium-thumb-link">
+      <img class="medium-thumb" height="245" width="520" loading="lazy" src="{{content.thumbnail}}">
+    </p>
+  </div>
+  <p class="medium-meta medium-caption">{{content.caption}}</p>
+  <p class="medium-meta medium-categories">{{content.categories | join: ' / ' }}</p>
+  <p class="medium-excerpt">{{content.excerpt}}</p>
+</div>

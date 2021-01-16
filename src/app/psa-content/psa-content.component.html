@@ -1,0 +1,25 @@
+<div class="content-body" *ngIf="content$ | async as con; else empty">
+
+    <p class="content-categories">{{con.categories | join: ' / ' }}</p>
+
+    <h1 class="content-name">{{con.name}}</h1>
+
+    <div>
+        <img class="content-thumb" height="460" width="1000" loading="lazy" src="{{con.thumbnail}}">
+        <p class="content-desc">{{con.content}}</p>
+        
+    </div>
+</div>
+<ng-template #empty>
+
+    <!--<div class="content-name content-name-loading fading"></div>-->
+    <h1 class="content-name">Loading...</h1>
+
+    <div>
+        <span class="content-thumb content-thumb-loading fading"></span>
+        <div class="content-desc-loading fading"></div>
+        <div class="content-desc-loading fading"></div>
+        <div class="content-desc-loading fading"></div>
+    </div>
+
+</ng-template>

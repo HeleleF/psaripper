@@ -35,8 +35,7 @@ module.exports = function (config) {
           webPreferences: {
             nodeIntegration: true,
             nodeIntegrationInSubFrames: true,
-            allowRunningInsecureContent: true,
-            enableRemoteModule: true
+            allowRunningInsecureContent: true
           }
         }
       }
