@@ -35,9 +35,13 @@ export class PsaContentComponent implements OnInit {
       error: (err: TimeoutError | HttpErrorResponse) => {
 
         if (err instanceof TimeoutError) {
-          console.log(err.message);
-          this.popup.close();
+          console.log(err.message, 'Zu lange gedauert');
+          return this.popup.close();
         }
+
+        // TODO(helene): content failed mit httpError. was dann?
+        // popup instant zu machen ist blöd, fehlermeldung anzeigen?
+        
 
       }
     });

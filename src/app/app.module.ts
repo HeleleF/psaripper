@@ -6,7 +6,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 
-import { AppRoutingModule } from './app-routing.module';
+//import { AppRoutingModule } from './app-routing.module';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -18,6 +18,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatExpansionModule} from '@angular/material/expansion';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { UiScrollModule } from 'ngx-ui-scroll';
@@ -31,6 +33,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { PsaContentComponent } from './psa-content/psa-content.component';
 
 import { JoinPipe } from './pipes/join.pipe';
+import { PsaReleaseListComponent } from './psa-release-list/psa-release-list.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -46,7 +49,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     PsaMediumComponent,
     PageNotFoundComponent,
     PsaContentComponent,
-    JoinPipe
+    JoinPipe,
+    PsaReleaseListComponent
   ],
   imports: [
     BrowserModule,
@@ -58,9 +62,11 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MatDividerModule,
     MatMenuModule,
     MatButtonModule,
+    MatTabsModule,
+    MatExpansionModule,
     BrowserAnimationsModule,
     UiScrollModule,
-    AppRoutingModule,
+    //AppRoutingModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

@@ -72,14 +72,14 @@ export class PsaMediaComponent implements OnInit {
       this.category = newCategory;
     }
 
-    this.mediaDatasource.adapter.reload(0);
+    this.mediaDatasource.adapter?.reload(0);
   }
 
   openMediumModal(id: string): void {
 
     const psaContent$ = this.ps.getShowById(id);
 
-    const ref = this.modal.open(PsaContentComponent, { 
+    this.modal.open(PsaContentComponent, { 
       width: 'auto',
       minWidth: '1255px',
       maxWidth: 'calc(100vw - 120px)',

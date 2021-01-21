@@ -3,5 +3,5 @@ export interface PSAShowRelease {
   sizeMB: number;
   source: string;
   hasSubtitles: boolean;
-  linkId: string;
+  exitLink: string;
 }

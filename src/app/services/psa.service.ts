@@ -4,7 +4,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 
 import { $, $$ } from '../shared/utils';
 
@@ -19,7 +19,7 @@ import { PSAShowRelease } from '../model/PSAShowRelease.interface';
 })
 export class PsaService {
 
-  readonly PSA_DOMAIN = 'psarips.uk';
+  PSA_DOMAIN = 'psa.one';
   dp: DOMParser;
 
   private readonly PSA_RELEASE_SIZE_PATTERN = /(?<size>(?:\d+|\d+\.\d+)) (?<byte>MB|GB)/;
@@ -39,30 +39,30 @@ export class PsaService {
       );
   }
 
-  private serializePSAMedia(doc: Document): PSAMedium[] {
+  private serializePSAMedia(doc: Document): (PSAMedium | null)[] {
     return Array.from({ ...doc.querySelectorAll('article'), length: 14 }, (maybeArticle: HTMLDivElement | undefined) => {
 
       if (!maybeArticle) return null;
 
       return {
         id: maybeArticle.id.slice(5),
-        name: maybeArticle.querySelector('.post-title > a')!.textContent,
-        thumbnail: (maybeArticle.querySelector('.post-thumbnail > a > img')! as HTMLImageElement).src,
-        fullLink: (maybeArticle.querySelector('.post-thumbnail > a')! as HTMLAnchorElement).href,
-        caption: maybeArticle.querySelector('.caption')!.textContent,
-        excerpt: maybeArticle.querySelector('.excerpt > p')!.textContent,
-        categories: [ ...maybeArticle.querySelectorAll('.post-category > a') ].map(a => a.textContent)
-      } as PSAMedium;
+        name: maybeArticle.querySelector('.post-title > a')?.textContent ?? 'No name found!',
+        thumbnail: maybeArticle.querySelector<HTMLImageElement>('.post-thumbnail > a > img')?.src ?? 'No thumbnail found!',
+        fullLink: maybeArticle.querySelector<HTMLAnchorElement>('.post-thumbnail > a')?.href ?? 'No link found!',
+        caption: maybeArticle.querySelector('.caption')?.textContent ?? 'No caption found!',
+        excerpt: maybeArticle.querySelector('.excerpt > p')?.textContent ?? 'No excerpt found!',
+        categories: [ ...maybeArticle.querySelectorAll('.post-category > a') ].map(a => a.textContent ?? '')
+      };
 
     });
   }
 
   private getShowReleaseSize(elm: HTMLElement): number {
 
-    const txt = $('p > strong > span', elm).nextSibling;
+    const txt = $('p > strong > span', elm)?.nextSibling;
     if (!txt) return 0;
 
-    const { groups } = this.PSA_RELEASE_SIZE_PATTERN.exec(txt.textContent) ?? {};
+    const { groups } = this.PSA_RELEASE_SIZE_PATTERN.exec(txt.textContent ?? '') ?? {};
     if (!groups) return 0;
 
     return groups.byte === 'MB' ? parseFloat(groups.size) : parseFloat(groups.size) * 1000;
@@ -71,28 +71,28 @@ export class PsaService {
   private getShowReleaseSource(elm: HTMLElement): string {
 
     const p = $('p:not([class]) > span > strong', elm)?.parentElement;
-    return p?.nextSibling?.textContent ?? 'None';
+    return p?.nextSibling?.textContent?.slice(2) ?? 'None';
   }
 
   private hasShowReleaseSubs(elm: HTMLElement): boolean {
 
-    const p = $('.sp-body > p:last-of-type', elm).previousElementSibling;
+    const p = $('.sp-body > p:last-of-type', elm)?.previousElementSibling;
 
-    if (!p || p.textContent.includes('NONE')) return false;
+    if (!p || p.textContent?.includes('NONE')) return false;
 
     return true;
   }
 
   private createShowRelease(elm: HTMLElement): PSAShowRelease | null {
 
-    const name = $('.sp-head', elm).textContent.trim();
+    const name = $('.sp-head', elm)?.textContent?.trim();
 
-    if (/[\u0337\u0336\u0335]/.test(name)) return null;
+    if (!name || /[\u0337\u0336\u0335]/.test(name)) return null;
 
     return {
       name,
       sizeMB: this.getShowReleaseSize(elm),
-      linkId: ($('strong > a', elm) as HTMLAnchorElement).pathname,
+      exitLink: ($('strong > a', elm) as HTMLAnchorElement).href,
       source: this.getShowReleaseSource(elm),
       hasSubtitles: this.hasShowReleaseSubs(elm)
     };
@@ -102,8 +102,8 @@ export class PsaService {
 
     let start = $('.entry-inner p', root);
 
-    while (!start.textContent.trim().length) {
-      start = start.nextElementSibling as HTMLElement;
+    while (!start?.textContent?.trim().length) {
+      start = start?.nextElementSibling as HTMLElement;
     }
 
     return start.textContent;
@@ -112,9 +112,9 @@ export class PsaService {
   private serializePSAShow(doc: Document): PSAShow {
 
     return {
-      name: $('.post-title', doc).textContent,
+      name: $('.post-title', doc)?.textContent ?? 'No name?',
       content: this.extractContent(doc),
-      categories: $$('.category a', doc).map(a => a.textContent),
+      categories: $$('.category a', doc).map(a => a.textContent ?? ''),
       releases: $$('.sp-wrap', doc).map(this.createShowRelease.bind(this)).filter((r): r is PSAShowRelease => !!r),
       thumbnail: ($('.entry-inner > a', doc) as HTMLAnchorElement).href 
     };
@@ -123,8 +123,8 @@ export class PsaService {
   private serializePSAMovie(doc: Document): PSAMovie {
 
     return {
-      name: $('.post-title', doc).textContent,
-      categories: $$('.category a', doc).map(a => a.textContent),
+      name: $('.post-title', doc)?.textContent ?? 'No name?',
+      categories: $$('.category a', doc).map(a => a.textContent ?? ''),
       thumbnail: ($('.entry-inner > a', doc) as HTMLAnchorElement).href,
       content: '',
       releases: []
@@ -136,9 +136,7 @@ export class PsaService {
     const uri = `https://${this.PSA_DOMAIN}/category/${category}/${page > 0 ? `page/${page + 1}/` : ''}`;
 
     return this.getPSADocument(uri).pipe(
-      map(doc => {
-        return this.serializePSAMedia(doc);
-      })
+      map(doc => this.serializePSAMedia(doc).filter((maybeMedium): maybeMedium is PSAMedium => !!maybeMedium))
     );
   }
 
@@ -172,16 +170,40 @@ export class PsaService {
         if (fullLink.includes('/tv-show/')) {
           return this.serializePSAShow(doc);
         }
-        if (fullLink.includes('/movie/')) {
-          return this.serializePSAMovie(doc);
+
+        return this.serializePSAMovie(doc);     
+      })
+    );
+  }
+
+  updatePSADomain(): Observable<string> {
+    return this.getPSADocument(`https://${this.PSA_DOMAIN}/psarips-active-domains-and-mirrors/`).pipe(
+      map(doc => {
+
+        const pTag = $('.entry p:nth-child(4)', doc);
+        if (!pTag) return this.PSA_DOMAIN;
+
+        const strongTag = $('strong', pTag);
+        const aTag = $('a', pTag) as HTMLAnchorElement | null;
+
+        if (strongTag?.textContent?.includes('Active') && aTag?.textContent?.startsWith('https://')) {
+          return aTag.href.slice(8).toLowerCase();
         }
-        
+
+        return this.PSA_DOMAIN;
+      }),
+      tap(maybeNewDomain => {
+
+        if (maybeNewDomain !== this.PSA_DOMAIN) {
+          this.PSA_DOMAIN = maybeNewDomain;
+          console.log(`Updated psa domain to ${maybeNewDomain}`);
+        }
       })
     );
   }
 
   private handleError(error: HttpErrorResponse) {
-    return this.http.get(`../../assets/dataFallback/${error.url.replace(/\?|:|\//g, '_')}.html`, { responseType: 'text' });
+    return this.http.get(`../../assets/dataFallback/${error.url?.replace(/\?|:|\//g, '_') ?? ''}.html`, { responseType: 'text' });
   }
 
 }

@@ -6,9 +6,9 @@
 
     <div>
         <img class="content-thumb" height="460" width="1000" loading="lazy" src="{{con.thumbnail}}">
-        <p class="content-desc">{{con.content}}</p>
-        
+        <p class="content-desc">{{con.content}}</p> 
     </div>
+    <app-psa-release-list [releases]="con.releases"></app-psa-release-list>
 </div>
 <ng-template #empty>
 

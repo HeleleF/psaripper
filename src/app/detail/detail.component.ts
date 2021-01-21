@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { from, Observable, of } from 'rxjs';
+import { ElectronService } from '../services/electron.service';
+import { AppSettings } from '../model/AppSettings.interface';
 
 @Component({
   selector: 'app-detail',
@@ -7,8 +10,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DetailComponent implements OnInit {
 
-  constructor() { }
+  settings$: Observable<AppSettings>;
 
-  ngOnInit(): void { }
+  constructor(private es: ElectronService) {
+
+    this.settings$ = this.es.isElectron ? from(this.es.ipcRenderer!.invoke('get-settings')) : of({ msg: 'not electron' });
+  }
+
+  ngOnInit(): void {
+  }
 
 }

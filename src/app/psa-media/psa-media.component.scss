@@ -1,12 +1,13 @@
 .viewport {
     width: calc(100vw - 100px);
-    height: calc(100vh - 50px);
+    height: calc(100vh - var(--title-height) - 49px); /* 49px ist exakt die höhe von mat tab header  + 1px für den unterstrich */
     overflow-y: auto;
-    margin-left: 100px;
+    margin-left: 50px;
+    margin-right: 50px;
 }
 
-.sidebar {
-    width: 100px;
-    float: left;
-    height: calc(100vh - 50px);
+
+.row {
+    display: flex;
+    justify-content: space-around;
 }

@@ -11,6 +11,8 @@
         "!package.json",
         "!package-lock.json",
         "!src/",
+        "src/app/shared/*",
+        "!src/app/shared/*.ts",
         "!e2e/",
         "!hooks/",
         "!angular.json",

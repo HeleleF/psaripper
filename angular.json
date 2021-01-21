@@ -33,6 +33,7 @@
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
+              "extractCss": true,
               "aot": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -48,8 +49,8 @@
               "optimization": false,
               "outputHashing": "all",
               "sourceMap": true,
-              "extractCss": true,
               "namedChunks": false,
+              "extractCss": true,
               "aot": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -75,7 +76,11 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
                 }
-              ]
+              ],
+              "index": {
+                "input": "src/index.prod.html",
+                "output": "index.html"
+              }
             }
           }
         },

@@ -8,5 +8,5 @@ import { PSAMedium } from '../model/PSAMedium.interface';
 })
 export class PsaMediumComponent {
 
-  @Input() content: PSAMedium;
+  @Input() content!: PSAMedium;
 }

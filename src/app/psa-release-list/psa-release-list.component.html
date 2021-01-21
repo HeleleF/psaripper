@@ -1,0 +1,9 @@
+<ul class="release-list">
+    <li *ngFor="let release of releases" class="release-list-item" (click)="extractRelease(release)">
+        <!--<pre>{{ release | json }}</pre>-->
+        {{ release.name }} - {{ release.sizeMB }} MB
+        <mat-icon *ngIf="release.hasSubtitles">closed_caption</mat-icon>
+    </li>
+</ul>
+
+

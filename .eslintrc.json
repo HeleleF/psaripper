@@ -5,6 +5,9 @@
       "es6": true,
       "es2017": true
   },
+  "ignorePatterns": [
+    "src/*.html"
+  ],
   "overrides": [
     {
       "files": ["*.ts"],
