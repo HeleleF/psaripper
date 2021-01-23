@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { PSACategory } from '../model/PSACategory.enum';
-import { PSAMedium } from '../model/PSAMedium.interface';
 import { PsaContentComponent } from '../psa-content/psa-content.component';
 
 import { Datasource, IDatasource } from 'ngx-ui-scroll';
 
-import { Observable, of, zip } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { PsaService } from '../services/psa.service';
@@ -17,53 +16,99 @@ import { PsaService } from '../services/psa.service';
   templateUrl: './psa-media.component.html',
   styleUrls: ['./psa-media.component.scss']
 })
-export class PsaMediaComponent implements OnInit {
+export class PsaMediaComponent implements OnInit, OnDestroy {
 
   mediaDatasource: IDatasource;
-  pageSize = 14;
+  
   category: PSACategory = PSACategory.SHOW;
+
+  private readonly ITEMS_PER_ROW = 4;
+  private readonly ITEMS_PER_PAGE = 14;
 
   constructor(
     private ps: PsaService,
     private modal: MatDialog
   ) {
-
     this.mediaDatasource = new Datasource({
       get: (startIndex: number, cnt: number) => {
 
-        const endIndex = startIndex + cnt - 1;
+        //console.groupCollapsed('GET');
 
+        // !!!REQUESTET WERDEN ROWS, NICHT ITEMS!!!
+
+        const endIndex = startIndex + cnt - 1;
         if (startIndex > endIndex) return of([]);
 
-        const startPage = Math.floor(startIndex / this.pageSize);
-        const endPage = Math.floor(endIndex / this.pageSize);
-    
-        const pagesRequest: Observable<PSAMedium[]>[] = [];
+        //console.log(`startIndex: ${startIndex} -> endIndex: ${endIndex} | Rows needed: ${cnt}`);
 
-        for (let i = startPage; i <= endPage; i++) {
-          pagesRequest.push(this.ps.getMediaByCategory(this.category, i));
-        }
+        const startPage = Math.floor(startIndex * this.ITEMS_PER_ROW / this.ITEMS_PER_PAGE);
+        const endPage = Math.floor(endIndex * this.ITEMS_PER_ROW / this.ITEMS_PER_PAGE);
 
-        return zip(...pagesRequest).pipe(
-          map(itemsList => {
+        // 1. we need items, not rows
+        const itemsNeeded = cnt * this.ITEMS_PER_ROW;
 
-            const start = startIndex - startPage * this.pageSize;
-            const end = start + cnt;
+        // 2. request as much pages as needed to fulfill the request
+        const pagesNeeded = endPage - startPage + 1;
 
-            return itemsList.flat().slice(start, end);
+        //console.log(`Items needed: ${itemsNeeded} -> Pages needed: ${pagesNeeded}, including pages ${startPage} through ${endPage}`);
+
+        const pageRequests = Array.from({ length: pagesNeeded }, (_, pageNum) => this.ps.getMediaByCategory(this.category, pageNum + startPage));
+
+        return forkJoin(pageRequests).pipe(
+          map(listOfPages => {
+
+            let items = listOfPages.flat();
+
+            // slice the needed sublist of items if needed
+            if (items.length > itemsNeeded) {
+
+              const start = startIndex * this.ITEMS_PER_ROW % this.ITEMS_PER_PAGE;
+              items = items.slice(start, start + itemsNeeded);
+            }
+
+            return Array.from({ length: cnt }, (_, i) => items.slice(i * this.ITEMS_PER_ROW, (i + 1) * this.ITEMS_PER_ROW));
           })
+          /*
+          map(listOfPages => {
+            return listOfPages.flat();
+          }),
+          tap(items => {
+            console.log(`Recieved ${items.length} items -> First: ${items[0].name} | Last: ${items[items.length - 1].name}`);
+          }),
+          map(items => {
+
+            // slice the needed sublist of items if needed
+            if (items.length > itemsNeeded) {
+
+              const start = startIndex * this.ITEMS_PER_ROW % this.ITEMS_PER_PAGE;
+              items = items.slice(start, start + itemsNeeded);
+            }
+
+            // item list is now evenly chunkable by ITEMS_PER_ROW
+            const rows = Array.from({ length: cnt }, (_, i) => items.slice(i * this.ITEMS_PER_ROW, (i + 1) * this.ITEMS_PER_ROW));
+            return rows;
+          }),
+          tap(rows => {
+            console.log(`Got ${rows.length} rows:\n${rows.map(row => `[ ${row.map(m => m.name.padEnd(12, ' ')).join('| ')} ]`).join('\n')}`);
+            console.groupEnd();
+          })
+          */
         );
       },
       settings: {
         minIndex: 0,
         startIndex: 0,
-        bufferSize: 14,
+        bufferSize: 7,
       }
     });
-
   }
 
   ngOnInit(): void { 
+    console.log('init');
+  }
+
+  ngOnDestroy(): void { 
+    console.log('were done');
   }
 
   reload(newCategory?: PSACategory): void {
@@ -84,7 +129,7 @@ export class PsaMediaComponent implements OnInit {
       minWidth: '1255px',
       maxWidth: 'calc(100vw - 120px)',
       height: 'auto', 
-      minHeight: 'calc(100vh - 90px)',
+      minHeight: 'calc(100vh - 90px)', // hier evntl noch ein maxHeight
       data: { psaContent$ },
       panelClass: 'content-panel'
     });

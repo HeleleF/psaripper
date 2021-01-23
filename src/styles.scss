@@ -41,6 +41,12 @@ $my-app-theme: mat-light-theme($my-app-primary, $my-app-accent);
   font-style: normal;
 }
 
+:root {
+  --title-height: 32px;
+  --toolbar-height: 50px;
+  --mat-dialog-container-color: #171717;
+}
+
 *,
 *::before,
 *::after {
@@ -86,30 +92,41 @@ p, ul {
 * CUSTOM SCROLLBARS
 */
 
-@mixin scrollbars($width, $foreground-color, $background-color: mix($foreground-color, white,  50%)) {
+@mixin scrollbars($width: null, $foreground-color: red, $background-color: mix($foreground-color, white,  50%)) {
 
-  &::-webkit-scrollbar {
-    width:  $width;
-    background: $background-color;
-  }
+  @if not ($width) {
 
-  &::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-    background: $foreground-color;
-  }
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
-  &::-webkit-scrollbar-track {
-    background: $background-color;
+  } @else {
+
+    &::-webkit-scrollbar {
+      width:  $width;
+      background: $background-color;
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+      background: $foreground-color;
+    }
+  
+    &::-webkit-scrollbar-track {
+      background: $background-color;
+    }
+
   }
 }
 
 .viewport {
-  @include scrollbars(12px, red, black);
+  //@include scrollbars(12px, red, black);
+  @include scrollbars()
 }
 
 .release-list {
-  @include scrollbars(12px, red, #171717);
+  @include scrollbars(12px, red, var(--mat-dialog-container-color));
 }
 
 /***
@@ -121,7 +138,7 @@ p, ul {
 }
 
 .content-panel .mat-dialog-container {
-  background: #171717;
+  background: var(--mat-dialog-container-color);
 }
 
 @media (-webkit-device-pixel-ratio: 1.5), (-webkit-device-pixel-ratio: 2), (-webkit-device-pixel-ratio: 3) {
@@ -129,11 +146,6 @@ p, ul {
     width: 10px;
     height: 10px;
   }
-}
-
-:root {
-  --title-height: 32px;
-  --toolbar-height: 50px;
 }
 
 .mat-tab-label {

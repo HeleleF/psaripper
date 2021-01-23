@@ -1,5 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, ElementRef, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { PSAShowRelease } from '../model/PSAShowRelease.interface';
 import { ElectronService } from '../services/electron.service';
 
@@ -10,38 +9,28 @@ import { ElectronService } from '../services/electron.service';
 })
 export class PsaReleaseListComponent implements OnInit, OnDestroy {
 
+  @ViewChild('yourTarget', { static: true }) yourTarget!: ElementRef<HTMLUListElement>;
+
   @Input() releases: PSAShowRelease[] = [];
-  sub: Subscription;
 
-  constructor(private es: ElectronService) {
-
-    this.sub = this.es.messages$.subscribe({
-      next: (data) => {
-
-        switch (data.command) {
-
-          case 'extract-started': 
-            console.log('started', data);
-            break;
-
-          case 'extract-done': 
-            console.log('done', data);
-            break;
-
-        }
-      }
-    });
+  constructor(private es: ElectronService, private ngZone: NgZone) {
   }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
   }
 
   ngOnInit(): void {
   }
 
-  extractRelease({ name, exitLink }: PSAShowRelease): void {
+  async extractRelease(index: number): Promise<void> {
 
-    this.es.sendMessage({ command: 'extract-start', name, exitLink });
+    const rel = this.releases[index];
+    const result = await this.es.ipcRenderer!.invoke('extract', rel);
+
+    this.ngZone.run(() => {
+      this.releases[index] = {...rel, ex: result };
+    });
+
+    
   }
 }

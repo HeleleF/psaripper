@@ -5,6 +5,7 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "removeComments": true,
     "strict": true,
     "target": "es2019",
     "types": [
@@ -17,8 +18,7 @@
     ]
   },
   "files": [
-    "main.ts",
-    "electron-store.ts"
+    "main.ts"
   ],
   "exclude": [
     "node_modules",

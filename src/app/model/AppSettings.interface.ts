@@ -11,5 +11,6 @@ export interface AppSettings {
   linksWhitelist: string[],
   linksBlacklist: string[],
   downloadMethod: DownloadMethod,
-  qualities: Quality
+  qualities: Quality,
+  language: 'en' | 'de'
 }

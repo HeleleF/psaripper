@@ -34,6 +34,7 @@ import { PsaContentComponent } from './psa-content/psa-content.component';
 
 import { JoinPipe } from './pipes/join.pipe';
 import { PsaReleaseListComponent } from './psa-release-list/psa-release-list.component';
+import { PsaJobComponent } from './psa-job/psa-job.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -50,7 +51,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     PageNotFoundComponent,
     PsaContentComponent,
     JoinPipe,
-    PsaReleaseListComponent
+    PsaReleaseListComponent,
+    PsaJobComponent,
   ],
   imports: [
     BrowserModule,

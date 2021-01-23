@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
-import { ElectronService } from '../services/electron.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { SettingsService } from '../services/settings.service';
 import { AppSettings } from '../model/AppSettings.interface';
 
 @Component({
@@ -8,16 +7,19 @@ import { AppSettings } from '../model/AppSettings.interface';
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss']
 })
-export class DetailComponent implements OnInit {
+export class DetailComponent implements OnInit, OnDestroy {
 
-  settings$: Observable<AppSettings>;
+  settings: AppSettings;
 
-  constructor(private es: ElectronService) {
+  constructor(private ss: SettingsService) {
 
-    this.settings$ = this.es.isElectron ? from(this.es.ipcRenderer!.invoke('get-settings')) : of({ msg: 'not electron' });
+    this.settings = this.ss.getAll();
   }
 
   ngOnInit(): void {
   }
 
+  ngOnDestroy(): void {
+    this.ss.save();
+  }
 }

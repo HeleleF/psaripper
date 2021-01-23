@@ -1,8 +1,8 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfig } from '../environments/environment';
 import { ElectronService } from './services/electron.service';
-import { fromEvent } from 'rxjs';
+import { fromEvent, Subscription } from 'rxjs';
 import { IpcRendererEvent } from 'electron/main';
 
 @Component({
@@ -10,11 +10,13 @@ import { IpcRendererEvent } from 'electron/main';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
   title = 'PSARipper';
   isElectron: boolean;
-  isMaximized = true;
+  isMaximized = false;
+
+  sub: Subscription | undefined;
 
   constructor(
     private translate: TranslateService,
@@ -32,7 +34,10 @@ export class AppComponent implements OnInit {
 
     if (!this.isElectron) return;
 
-    fromEvent<[IpcRendererEvent, boolean]>(this.es.ipcRenderer!, 'window-max-restore-toggle').subscribe({
+    console.log('app init');
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.sub = fromEvent<[IpcRendererEvent, boolean]>(this.es.ipcRenderer!, 'window-max-restore-toggle').subscribe({
       next: ([, maxi]) => {
         this.ngZone.run(() => {
           this.isMaximized = maxi;
@@ -52,5 +57,9 @@ export class AppComponent implements OnInit {
   }
   closeWindow(): void {
     this.es.ipcRenderer?.send('cmd-to-main', { command: 'close-window' });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 }

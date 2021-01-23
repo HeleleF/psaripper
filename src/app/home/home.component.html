@@ -1,8 +1,7 @@
-<div class="container">
-  <h1 class="title">
-    {{ 'PAGES.HOME.TITLE' | translate }}
-  </h1>
-
-  <div>knibbel di barbsen bub</div>
-
+<div class="job-control-buttons">
+  <button matButton (click)="addNewJob()">Add job</button>
+  <button matButton (click)="updateJob()">Update job</button>
 </div>
+<ul class="joblist">
+  <app-psa-job *ngFor="let job of (jobs$ | async); index as idx" [jobData]="job" [jobIndex]="idx"></app-psa-job>
+</ul>

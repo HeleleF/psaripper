@@ -1,11 +1,8 @@
+<p class="scroll-load" *ngIf="mediaDatasource.adapter!.isLoading$ | async">LOADING</p>
 <div class="viewport">
   <div *uiScroll="let item of mediaDatasource">
     <div class="row">
-      <app-psa-medium [content]="item" (click)="openMediumModal(item.id)"></app-psa-medium>
-      <app-psa-medium [content]="item" (click)="openMediumModal(item.id)"></app-psa-medium>
-      <app-psa-medium [content]="item" (click)="openMediumModal(item.id)"></app-psa-medium>
-      <app-psa-medium [content]="item" (click)="openMediumModal(item.id)"></app-psa-medium>
+      <app-psa-medium *ngFor="let medium of item" [content]="medium" (click)="openMediumModal(medium.id)"></app-psa-medium>
     </div>
-
   </div>
 </div>

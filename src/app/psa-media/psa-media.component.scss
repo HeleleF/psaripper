@@ -1,13 +1,26 @@
 .viewport {
-    width: calc(100vw - 100px);
+    width: calc(100vw - 50px);
     height: calc(100vh - var(--title-height) - 49px); /* 49px ist exakt die höhe von mat tab header  + 1px für den unterstrich */
     overflow-y: auto;
-    margin-left: 50px;
-    margin-right: 50px;
+    margin-left: 25px;
+    margin-right: 25px;
 }
 
 
 .row {
     display: flex;
     justify-content: space-around;
+    border-bottom: 1px solid #252525;
+    margin-bottom: 5px;
+    padding-bottom: 15px;
+}
+
+.scroll-load {
+    color: white;
+    font-weight: 400;
+    font-size: 40px;
+    position: absolute;
+    z-index: 10;
+    top: 40%;
+    left: 45%;
 }

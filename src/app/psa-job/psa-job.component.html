@@ -1,0 +1,7 @@
+<div class="job-wrapper">
+    <p class="job-nr">{{ jobIndex }}</p>
+    <p class="job-status">{{ jobData.status }}</p>
+    <p class="job-id">{{ jobData.id }}</p>
+    <p class="job-release-name">{{ jobData.release.name }}</p>
+    <p class="job-error-message" *ngIf="jobData.status === -1">{{ jobData.errorMessage }}</p>
+</div>

@@ -3,7 +3,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 
 import { $, $$ } from '../shared/utils';
@@ -14,21 +14,31 @@ import { PSAMovie } from '../model/PSAMovie.interface';
 import { PSACategory } from '../model/PSACategory.enum';
 import { PSAShowRelease } from '../model/PSAShowRelease.interface';
 
+interface PSAMediumCache {
+  [key: string]: PSAMedium[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class PsaService {
 
-  PSA_DOMAIN = 'psa.one';
-  dp: DOMParser;
+  private PSA_DOMAIN = 'psa.one';
+  private dp: DOMParser;
+
+  private readonly PSA_CACHE_KEY = 'psa_service_key';
 
   private readonly PSA_RELEASE_SIZE_PATTERN = /(?<size>(?:\d+|\d+\.\d+)) (?<byte>MB|GB)/;
+  private CACHE: PSAMediumCache;
 
   constructor(
     private http: HttpClient
   ) {
 
     this.dp = new DOMParser();
+
+    const maybeCached = localStorage.getItem(this.PSA_CACHE_KEY);
+    this.CACHE = maybeCached ? JSON.parse(maybeCached) : {};
   }
 
   private getPSADocument(uri: string) {
@@ -133,10 +143,17 @@ export class PsaService {
 
   getMediaByCategory(category: PSACategory, page = 0): Observable<PSAMedium[]> {
 
-    const uri = `https://${this.PSA_DOMAIN}/category/${category}/${page > 0 ? `page/${page + 1}/` : ''}`;
+    const cacheKey = `${category}-${page}`;
+    if (cacheKey in this.CACHE) return of(this.CACHE[cacheKey]);
+
+    //const uri = `https://${this.PSA_DOMAIN}/category/${category}/${page > 0 ? `page/${page + 1}/` : ''}`;
+    const uri = `../../assets/dataFallback/page${page}.html`;
 
     return this.getPSADocument(uri).pipe(
-      map(doc => this.serializePSAMedia(doc).filter((maybeMedium): maybeMedium is PSAMedium => !!maybeMedium))
+      map(doc => this.serializePSAMedia(doc).filter((maybeMedium): maybeMedium is PSAMedium => !!maybeMedium)),
+      tap(media => {
+        this.CACHE[cacheKey] = media;
+      })
     );
   }
 
@@ -202,8 +219,22 @@ export class PsaService {
     );
   }
 
+  deleteCache(): void {
+    this.CACHE = {};
+    localStorage.removeItem(this.PSA_CACHE_KEY);
+  }
+
+  saveCache(): void {
+    localStorage.setItem(this.PSA_CACHE_KEY, JSON.stringify(this.CACHE));
+  }
+
   private handleError(error: HttpErrorResponse) {
-    return this.http.get(`../../assets/dataFallback/${error.url?.replace(/\?|:|\//g, '_') ?? ''}.html`, { responseType: 'text' });
+
+    if (error.status === 503) {
+      return throwError('Blocked by wordfence :(');
+    } else {
+      return this.http.get(`../../assets/dataFallback/${error.url?.replace(/\?|:|\//g, '_') ?? ''}.html`, { responseType: 'text' });
+    }
   }
 
 }
