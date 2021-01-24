@@ -34,7 +34,7 @@ export class SettingsService {
 
   private get defaultUserData(): AppSettings {
     return {
-      linksWhitelist: [],
+      linksWhitelist: ['https://mega.nz'],
       linksBlacklist: [],
       downloadMethod: DownloadMethod.JD,
       qualities: '720p',
