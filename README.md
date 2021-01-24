@@ -43,6 +43,12 @@ This way we can have a fancy ES module as entry point to electron.
 
 ### Created from template:
 
+
+# Own fonts
+
+muss sein
+
+
 # Introduction
 
 Bootstrap and package your project with Angular 11 and Electron 11 (Typescript + SASS + Hot Reload) for creating Desktop applications.
