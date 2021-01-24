@@ -4,5 +4,6 @@ export interface PSAShowRelease {
   source: string;
   hasSubtitles: boolean;
   exitLink: string;
-  ex?: boolean;
+  season: number;
+  episode: number;
 }

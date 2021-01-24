@@ -1,21 +1,46 @@
 .job-wrapper {
-    background-color: #171717;
-    border: 1px solid yellow;
+    background-color: #212121;
+    border: 1px solid #444444;
     margin: 15px;
-    padding: 5px;
+    padding: 8px;
+    border-radius: 15px;
+
+    &:hover {
+        cursor: pointer;
+    }
 }
 
 .job-status {
-    color: blueviolet
+
+    &.extracting {
+        color: cyan;
+    }
+    &.success {
+        color: greenyellow;
+    }
+    &.failed {
+        color: red;
+    }
 }
+
 .job-id {
-    color: greenyellow
+    color: #84a7d2;
+    font-size: small;
 }
 .job-nr {
-    color: hotpink;
+    color: #dedbcc;
+
+    font-family: Georgia;
+    font-size: 24px;
+    font-weight: bold;
+
+    float: right;
+
+    margin-right: 5px;
+    margin-top: 5px;
 }
 .job-release-name {
-    color: white;
+    color: #d8d8d8;
 }
 .job-error-message {
     color: red;

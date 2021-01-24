@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, HostListener, Inject, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -27,6 +27,10 @@ export class PsaContentComponent implements OnInit {
       timeout(this.TIMEOUT),
       shareReplay(1)
     );
+  }
+
+  @HostListener('window:keyup.esc') onKeyUp() {
+    this.popup.close();
   }
 
   ngOnInit(): void {

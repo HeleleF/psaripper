@@ -1,6 +1,6 @@
-import { Component, ElementRef, Input, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { PSAShowRelease } from '../model/PSAShowRelease.interface';
-import { ElectronService } from '../services/electron.service';
+import { ExtractAndDownloadService } from '../services/extract-and-download.service';
 
 @Component({
   selector: 'app-psa-release-list',
@@ -9,11 +9,12 @@ import { ElectronService } from '../services/electron.service';
 })
 export class PsaReleaseListComponent implements OnInit, OnDestroy {
 
-  @ViewChild('yourTarget', { static: true }) yourTarget!: ElementRef<HTMLUListElement>;
-
   @Input() releases: PSAShowRelease[] = [];
 
-  constructor(private es: ElectronService, private ngZone: NgZone) {
+  constructor(
+    private eds: ExtractAndDownloadService,
+    private ngZone: NgZone
+  ) {
   }
 
   ngOnDestroy(): void {
@@ -22,15 +23,9 @@ export class PsaReleaseListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  async extractRelease(index: number): Promise<void> {
+  extractRelease(index: number) {
 
     const rel = this.releases[index];
-    const result = await this.es.ipcRenderer!.invoke('extract', rel);
-
-    this.ngZone.run(() => {
-      this.releases[index] = {...rel, ex: result };
-    });
-
-    
+    this.eds.startExtract(rel);
   }
 }

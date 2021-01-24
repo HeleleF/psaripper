@@ -29,6 +29,7 @@ export class PsaService {
   private readonly PSA_CACHE_KEY = 'psa_service_key';
 
   private readonly PSA_RELEASE_SIZE_PATTERN = /(?<size>(?:\d+|\d+\.\d+)) (?<byte>MB|GB)/;
+  private readonly PSA_RELEASE_NUM_PATTERN = /\.S(?<season>\d{2})E(?<episode>\d{2})\./;
   private CACHE: PSAMediumCache;
 
   constructor(
@@ -93,18 +94,32 @@ export class PsaService {
     return true;
   }
 
+  private getShowReleaseNum(name: string) {
+
+    const { groups } = this.PSA_RELEASE_NUM_PATTERN.exec(name) ?? {};
+
+    return {
+      season: parseInt(groups?.season ?? '99'),
+      episode: parseInt(groups?.episode ?? '99')
+    };
+  }
+
   private createShowRelease(elm: HTMLElement): PSAShowRelease | null {
 
     const name = $('.sp-head', elm)?.textContent?.trim();
 
     if (!name || /[\u0337\u0336\u0335]/.test(name)) return null;
 
+    const { season, episode } = this.getShowReleaseNum(name);
+
     return {
       name,
       sizeMB: this.getShowReleaseSize(elm),
       exitLink: ($('strong > a', elm) as HTMLAnchorElement).href,
       source: this.getShowReleaseSource(elm),
-      hasSubtitles: this.hasShowReleaseSubs(elm)
+      hasSubtitles: this.hasShowReleaseSubs(elm),
+      season,
+      episode
     };
   }
 
@@ -125,7 +140,10 @@ export class PsaService {
       name: $('.post-title', doc)?.textContent ?? 'No name?',
       content: this.extractContent(doc),
       categories: $$('.category a', doc).map(a => a.textContent ?? ''),
-      releases: $$('.sp-wrap', doc).map(this.createShowRelease.bind(this)).filter((r): r is PSAShowRelease => !!r),
+      releases: $$('.sp-wrap', doc)
+        .map(this.createShowRelease.bind(this))
+        .filter((r): r is PSAShowRelease => !!r)
+        .sort(({season: xs, episode: xe}, {season: ys, episode: ye}) => ys - xs === 0 ? ye - xe : ys - xs),
       thumbnail: ($('.entry-inner > a', doc) as HTMLAnchorElement).href 
     };
   }
@@ -146,8 +164,8 @@ export class PsaService {
     const cacheKey = `${category}-${page}`;
     if (cacheKey in this.CACHE) return of(this.CACHE[cacheKey]);
 
-    //const uri = `https://${this.PSA_DOMAIN}/category/${category}/${page > 0 ? `page/${page + 1}/` : ''}`;
-    const uri = `../../assets/dataFallback/page${page}.html`;
+    const uri = `https://${this.PSA_DOMAIN}/category/${category}/${page > 0 ? `page/${page + 1}/` : ''}`;
+    //const uri = `../../assets/dataFallback/page${page}.html`;
 
     return this.getPSADocument(uri).pipe(
       map(doc => this.serializePSAMedia(doc).filter((maybeMedium): maybeMedium is PSAMedium => !!maybeMedium)),

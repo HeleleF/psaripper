@@ -22,4 +22,9 @@ export class DetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.ss.save();
   }
+
+  saveD() {
+    console.log(this.settings);
+    this.ss.update('downloadMethod', this.settings.downloadMethod);
+  }
 }

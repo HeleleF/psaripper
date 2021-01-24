@@ -1,7 +1,3 @@
-<div class="job-control-buttons">
-  <button matButton (click)="addNewJob()">Add job</button>
-  <button matButton (click)="updateJob()">Update job</button>
-</div>
 <ul class="joblist">
-  <app-psa-job *ngFor="let job of (jobs$ | async); index as idx" [jobData]="job" [jobIndex]="idx"></app-psa-job>
+  <app-psa-job *ngFor="let job of (jobs$ | async); index as idx" [jobData]="job" [jobIndex]="idx" (click)="removeJob(job.id)"></app-psa-job>
 </ul>

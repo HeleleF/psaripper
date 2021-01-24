@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { PSAJobData } from '../model/PSAJobData.interface';
+import { PSAJobData, PSAJobStatus } from '../model/PSAJobData.interface';
 
 @Component({
   selector: 'app-psa-job',
@@ -8,13 +8,18 @@ import { PSAJobData } from '../model/PSAJobData.interface';
 })
 export class PsaJobComponent implements OnInit {
 
+  ST = PSAJobStatus;
+
   @Input() jobIndex!: number;
   @Input() jobData!: PSAJobData;
 
-  constructor() { }
+  constructor() {
+  }
   
 
   ngOnInit(): void {
   }
+
+
 
 }

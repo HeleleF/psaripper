@@ -8,7 +8,35 @@ $my-app-theme: mat-light-theme($my-app-primary, $my-app-accent);
 
 @include angular-material-theme($my-app-theme);
 
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+//@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(./assets/material-icons/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+}
 
 @font-face {
   font-family: 'Titillium';
@@ -141,6 +169,10 @@ p, ul {
   background: var(--mat-dialog-container-color);
 }
 
+.content-backdrop {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
 @media (-webkit-device-pixel-ratio: 1.5), (-webkit-device-pixel-ratio: 2), (-webkit-device-pixel-ratio: 3) {
   #window-controls .icon {
     width: 10px;
@@ -149,7 +181,7 @@ p, ul {
 }
 
 .mat-tab-label {
-  color: hotpink;
+  color: white;
 }
 
 mat-tab-group {

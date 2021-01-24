@@ -109,6 +109,7 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void { 
     console.log('were done');
+    this.ps.saveCache();
   }
 
   reload(newCategory?: PSACategory): void {
@@ -120,9 +121,9 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
     this.mediaDatasource.adapter?.reload(0);
   }
 
-  openMediumModal(id: string): void {
+  openMediumModal(fullLink: string): void {
 
-    const psaContent$ = this.ps.getShowById(id);
+    const psaContent$ = this.ps.getContentByFullLink(fullLink);
 
     this.modal.open(PsaContentComponent, { 
       width: 'auto',
@@ -131,7 +132,9 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
       height: 'auto', 
       minHeight: 'calc(100vh - 90px)', // hier evntl noch ein maxHeight
       data: { psaContent$ },
-      panelClass: 'content-panel'
+      panelClass: 'content-panel',
+      disableClose: true,
+      backdropClass: 'content-backdrop'
     });
   }
 }

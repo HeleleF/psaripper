@@ -3,4 +3,5 @@
     {{ 'PAGES.DETAIL.TITLE' | translate }}
   </h1>
   <pre>{{ settings | json }}</pre>
+  <input type="text" [(ngModel)]="settings.downloadMethod" (change)="saveD()">
 </div>

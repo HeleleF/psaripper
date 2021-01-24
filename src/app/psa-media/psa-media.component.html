@@ -2,7 +2,7 @@
 <div class="viewport">
   <div *uiScroll="let item of mediaDatasource">
     <div class="row">
-      <app-psa-medium *ngFor="let medium of item" [content]="medium" (click)="openMediumModal(medium.id)"></app-psa-medium>
+      <app-psa-medium *ngFor="let medium of item" [content]="medium" (click)="openMediumModal(medium.fullLink)"></app-psa-medium>
     </div>
   </div>
 </div>
