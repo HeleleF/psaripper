@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen, ipcMain } from 'electron';
+import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import { extract } from './src/app/shared/message.interface';
 import { IPCData } from './src/app/shared/model.interface';
 import { BrowserWindowConstructorOptions } from 'electron';
@@ -72,6 +72,10 @@ ipcMain.on('cmd-to-main', (ev, data: IPCData) => {
 
   switch (data.command) {
 
+    case 'open-window':
+      shell.openExternal(data.link);
+      break;
+
     case 'minimize-window':
       win?.minimize();
       break;
@@ -98,6 +102,9 @@ ipcMain.on('cmd-to-main', (ev, data: IPCData) => {
   }
 });
 
-ipcMain.handle('extract', (data: any) => {
+ipcMain.handle('extract', (ev, data: any) => {
+
+  console.log(data);
+
   return extract(data.exitLink, data.name);
 });
