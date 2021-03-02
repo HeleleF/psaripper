@@ -1,40 +1,40 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { from, Observable, of, throwError } from 'rxjs';
+
+import { from, Observable, of } from 'rxjs';
 import { catchError, delay, map, switchMap, tap } from 'rxjs/operators';
-import { DownloadMethod } from '../model/AppSettings.interface';
-import { PSAJobStatus } from '../model/PSAJobData.interface';
-import { PSAShowRelease } from '../model/PSAShowRelease.interface';
+
 import { ElectronService } from './electron.service';
 import { JobService } from './job.service';
 import { SettingsService } from './settings.service';
+
+import { DownloadMethod } from '../model/AppSettings.interface';
+import { PSAJobStatus } from '../model/PSAJobData.interface';
+import { PSAMovieRelease, PSAShowRelease } from '../model/PSARelease.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExtractAndDownloadService {
 
-  private dp: DOMParser;
+  private readonly JD_API = 'http://127.0.0.1:9666/flashgot';
 
   constructor(
     private http: HttpClient,
     private es: ElectronService,
     private js: JobService,
     private ss: SettingsService,
-  ) {
-    
-    this.dp = new DOMParser();
+  ) {}
 
-  }
-
-  private sendToJD(link: string) {
-    return this.http.get(`http://127.0.0.1:9666/flashgot?source=psa2jd_thisisasecretvalue_xxx&package=pkg&dir=tmp&urls=${encodeURIComponent(link)}`, { responseType: 'text' }).pipe(
+  private sendToJD(link: string): Observable<boolean> {
+    return this.http.get(`${this.JD_API}?source=psa2jd_thisisasecretvalue_xxx&package=pkg&dir=tmp&urls=${encodeURIComponent(link)}`, { responseType: 'text' }).pipe(
       catchError(() => of('')),
       map(html => html.includes('.jar'))
     );
   }
 
-  downloadRelease(link: string) {
+  downloadRelease(link: string): Observable<boolean> {
 
     switch (this.ss.get('downloadMethod')) {
 
@@ -48,21 +48,23 @@ export class ExtractAndDownloadService {
 
       case DownloadMethod.BROWSER:
       default: 
-        console.log('Opening in default browser...');
+        console.log('Opening in default browser...', link);
         this.es.ipcRenderer!.send('cmd-to-main', { command: 'open-window', link }); //TODO(helene): failed in prod mit undefined error?
         return of(true);
     }
 
   }
 
-  startExtract(release: PSAShowRelease) {
+  startExtract(release: PSAShowRelease | PSAMovieRelease): Observable<boolean> {
 
     const id = Math.random().toString(36).slice(2);
     const whitelist = this.ss.get('linksWhitelist');
 
     this.js.addNewJob({ id, release, status: PSAJobStatus.STARTING });
 
-    const job$ = from<Promise<string[]>>(this.es.ipcRenderer!.invoke('extract', release)).pipe(
+    const extractionResult: Promise<string[]> = this.es.ipcRenderer!.invoke('extract', release);
+
+    const job$ = from(extractionResult).pipe(
       tap(() => this.js.updateJob(id, { status: PSAJobStatus.EXTRACTED })),
       map(releases => releases.filter(r => {
         const origin = new URL(r).origin;

@@ -1,4 +1,4 @@
-import { Component, HostListener, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -7,6 +7,7 @@ import { Observable, TimeoutError } from 'rxjs';
 import { shareReplay, timeout } from 'rxjs/operators';
 
 import { PSAShow } from '../model/PSAShow.interface';
+import { PSAMovie } from '../model/PSAMovie.interface';
 
 @Component({
   selector: 'app-psa-content',
@@ -15,22 +16,18 @@ import { PSAShow } from '../model/PSAShow.interface';
 })
 export class PsaContentComponent implements OnInit {
 
-  content$: Observable<PSAShow>;
+  content$: Observable<PSAShow | PSAMovie>;
   private readonly TIMEOUT = 3500;
 
   constructor(
     public popup: MatDialogRef<PsaContentComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { psaContent$: Observable<PSAShow> }
+    @Inject(MAT_DIALOG_DATA) public data: { psaContent$: Observable<PSAShow | PSAMovie> }
   ) {
 
     this.content$ = this.data.psaContent$.pipe(
       timeout(this.TIMEOUT),
       shareReplay(1)
     );
-  }
-
-  @HostListener('window:keyup.esc') onKeyUp() {
-    this.popup.close();
   }
 
   ngOnInit(): void {
@@ -50,5 +47,9 @@ export class PsaContentComponent implements OnInit {
       }
     });
 
+  }
+
+  closeModal(): void {
+    this.popup.close();
   }
 }

@@ -1,4 +1,14 @@
-<p class="scroll-load" *ngIf="mediaDatasource.adapter!.isLoading$ | async">LOADING</p>
+<div class="button-row">
+  <button mat-icon-button color="accent" (click)="clearCache()">
+    <mat-icon>home</mat-icon>
+  </button>
+  <mat-form-field appearence="fill">
+    <mat-label>Select an option</mat-label>
+    <mat-select disableRipple [(value)]="category" (selectionChange)="reload()">
+      <mat-option *ngFor="let cat of categories" [value]="ALL_CATS[cat]">{{ cat }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
 <div class="viewport">
   <div *uiScroll="let item of mediaDatasource">
     <div class="row">

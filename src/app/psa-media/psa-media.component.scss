@@ -1,6 +1,10 @@
+.button-row {
+    height: 50px;
+}
+
 .viewport {
     width: calc(100vw - 50px);
-    height: calc(100vh - var(--title-height) - 49px); /* 49px ist exakt die höhe von mat tab header  + 1px für den unterstrich */
+    height: calc(100vh - var(--title-height) - 99px); /* 49px ist exakt die höhe von mat tab header  + 1px für den unterstrich */
     overflow-y: auto;
     margin-left: 25px;
     margin-right: 25px;

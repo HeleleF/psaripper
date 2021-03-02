@@ -20,7 +20,9 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
 
   mediaDatasource: IDatasource;
   
+  readonly ALL_CATS = PSACategory;
   category: PSACategory = PSACategory.SHOW;
+  readonly categories: string[];
 
   private readonly ITEMS_PER_ROW = 4;
   private readonly ITEMS_PER_PAGE = 14;
@@ -29,6 +31,8 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
     private ps: PsaService,
     private modal: MatDialog
   ) {
+    this.categories = Object.keys(PSACategory);
+
     this.mediaDatasource = new Datasource({
       get: (startIndex: number, cnt: number) => {
 
@@ -103,8 +107,7 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void { 
-    console.log('init');
+  ngOnInit(): void {
   }
 
   ngOnDestroy(): void { 
@@ -117,7 +120,13 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
     if (newCategory) {
       this.category = newCategory;
     }
+    console.log(this.category);
 
+    this.mediaDatasource.adapter?.reload(0);
+  }
+
+  clearCache(): void {
+    this.ps.deleteCache();
     this.mediaDatasource.adapter?.reload(0);
   }
 
@@ -133,7 +142,6 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
       minHeight: 'calc(100vh - 90px)', // hier evntl noch ein maxHeight
       data: { psaContent$ },
       panelClass: 'content-panel',
-      disableClose: true,
       backdropClass: 'content-backdrop'
     });
   }

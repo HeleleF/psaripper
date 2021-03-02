@@ -1,7 +1,7 @@
 <div class="content-body" *ngIf="content$ | async as con; else empty">
 
     <p class="content-categories">{{con.categories | join: ' / ' }}</p>
-
+    <button class="content-close" mat-icon-button color="accent" (click)="closeModal()"><mat-icon>close</mat-icon></button>
     <h1 class="content-name">{{con.name}}</h1>
 
     <div>

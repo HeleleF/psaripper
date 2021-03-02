@@ -72,6 +72,10 @@ ipcMain.on('cmd-to-main', (ev, data: IPCData) => {
 
   switch (data.command) {
 
+    case 'open-devtools':
+      win?.webContents.openDevTools();
+      break;
+
     case 'open-window':
       shell.openExternal(data.link);
       break;
@@ -104,7 +108,7 @@ ipcMain.on('cmd-to-main', (ev, data: IPCData) => {
 
 ipcMain.handle('extract', (ev, data: any) => {
 
-  console.log(data);
+  console.log('Extraction request for', data);
 
-  return extract(data.exitLink, data.name);
+  return extract(data.exitLinks /*, data.name*/);
 });

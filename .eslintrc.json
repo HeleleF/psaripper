@@ -12,14 +12,17 @@
     {
       "files": ["*.ts"],
       "extends": [
+        "plugin:@angular-eslint/recommended",
+				"plugin:@angular-eslint/template/process-inline-templates",
         "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "prettier/@typescript-eslint",
+        "plugin:prettier/recommended"
       ],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
-        "ecmaVersion": 10,
+        "ecmaVersion": 2020,
         "project": [
           "./tsconfig.serve.json",
           "./src/tsconfig.app.json",
@@ -44,7 +47,6 @@
             "FunctionDeclaration": {"parameters": "first"}
           }
         ],
-        "@typescript-eslint/no-empty-function": 0,
         "@typescript-eslint/no-explicit-any": 0,
         "@typescript-eslint/no-var-requires": 0,
         "@typescript-eslint/no-unsafe-call": 0,
@@ -54,13 +56,21 @@
         "@typescript-eslint/no-floating-promises": 0,
         "@typescript-eslint/semi": "error",
         "@angular-eslint/use-injectable-provided-in": "error",
-        "@angular-eslint/no-attribute-decorator": "error"
+        "@angular-eslint/no-attribute-decorator": "error",
+        "@typescript-eslint/no-empty-function": [
+					"error",
+					{ "allow": ["constructors"] }
+				],
+				"no-console": "warn"
       }
     },
     {
       "files": ["*.component.html"],
-      "parser": "@angular-eslint/template-parser",
-      "plugins": ["@angular-eslint/template"],
+			"extends": [
+				"plugin:@angular-eslint/template/recommended",
+				"prettier/@typescript-eslint",
+				"plugin:prettier/recommended"
+			],
       "rules": {
           "@angular-eslint/template/banana-in-box": "error",
           "@angular-eslint/template/no-negated-async": "error"

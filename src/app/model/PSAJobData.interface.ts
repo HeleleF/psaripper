@@ -1,4 +1,4 @@
-import { PSAShowRelease } from './PSAShowRelease.interface';
+import { PSAShowRelease } from './PSARelease.interface';
 
 export enum PSAJobStatus {
   STARTING = 0,

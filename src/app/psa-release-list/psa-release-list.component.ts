@@ -1,5 +1,5 @@
-import { Component, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { PSAShowRelease } from '../model/PSAShowRelease.interface';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { PSAMovieRelease, PSAShowRelease } from '../model/PSARelease.interface';
 import { ExtractAndDownloadService } from '../services/extract-and-download.service';
 
 @Component({
@@ -9,11 +9,10 @@ import { ExtractAndDownloadService } from '../services/extract-and-download.serv
 })
 export class PsaReleaseListComponent implements OnInit, OnDestroy {
 
-  @Input() releases: PSAShowRelease[] = [];
+  @Input() releases: (PSAShowRelease | PSAMovieRelease)[] = [];
 
   constructor(
-    private eds: ExtractAndDownloadService,
-    private ngZone: NgZone
+    private eds: ExtractAndDownloadService
   ) {
   }
 
@@ -23,7 +22,7 @@ export class PsaReleaseListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  extractRelease(index: number) {
+  extractRelease(index: number): void {
 
     const rel = this.releases[index];
     this.eds.startExtract(rel);

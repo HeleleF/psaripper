@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { PSAJobData, PSAJobStatus } from '../model/PSAJobData.interface';
+import { PSAJobData } from '../model/PSAJobData.interface';
 
 @Injectable({
   providedIn: 'root'

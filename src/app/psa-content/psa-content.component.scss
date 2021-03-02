@@ -1,4 +1,11 @@
 .content-body {
+    position: relative;
+}
+
+.content-close {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .content-name {

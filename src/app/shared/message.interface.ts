@@ -19,9 +19,8 @@ const dp = new (new JSDOM().window.DOMParser)();
 
 let lastIndex = 9;
 
-async function extractOuoIo(ouoioLink: string): Promise<string[]> {
 
-  console.time('ouo-load');
+async function extractOuoIo(ouoioLink: string): Promise<string[]> {
 
   const { data: ouoCaptcha1 } = await axiosInstance.get(ouoioLink);
 
@@ -52,12 +51,16 @@ async function extractOuoIo(ouoioLink: string): Promise<string[]> {
 
   const links = Array.from(doc.querySelectorAll<HTMLAnchorElement>('.entry-content a'), aTag => aTag.href);
 
-  console.timeEnd('ouo-load');
   console.log(links);
 
   return links;
 }
 
+/**
+ * This doesnt work anymore (since Feb 2021)
+ * @deprecated
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function guess(releaseName: string): Promise<string[]> {
 
   const kebab = releaseName.toLowerCase().replace(/\./g, '-');
@@ -126,23 +129,19 @@ async function getOuoRedirect(exitLink: string): Promise<string> {
     if (headers.location?.includes('ouo')) return headers.location;
 
   // eslint-disable-next-line no-empty
-  } catch {}
+  } catch (e) {
+    console.log('No 302', e.response);
+  }
+  
 
   return updateOuoIndex(exitLink, cj);
 }
 
-export async function extract(exitLink: string, releaseName?: string): Promise<string[]> {
-
-  console.log('Extracting...');
-
-  if (releaseName) {
-    const results = await guess(releaseName);
-    if (results.length) return results;
-  }
+export async function extract(exitLinks: string[]): Promise<string[]> {
 
   console.log(`Get redirect with index ${lastIndex}...`);
 
-  const redirect = await getOuoRedirect(exitLink);
+  const redirect = await getOuoRedirect(exitLinks[0]);
 
   if (!redirect) return [];
 

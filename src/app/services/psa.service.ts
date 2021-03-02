@@ -12,7 +12,7 @@ import { PSAMedium } from '../model/PSAMedium.interface';
 import { PSAShow } from '../model/PSAShow.interface';
 import { PSAMovie } from '../model/PSAMovie.interface';
 import { PSACategory } from '../model/PSACategory.enum';
-import { PSAShowRelease } from '../model/PSAShowRelease.interface';
+import { PSAShowRelease, PSAMovieRelease } from '../model/PSARelease.interface';
 
 interface PSAMediumCache {
   [key: string]: PSAMedium[];
@@ -68,7 +68,7 @@ export class PsaService {
     });
   }
 
-  private getShowReleaseSize(elm: HTMLElement): number {
+  private getReleaseSize(elm: HTMLElement): number {
 
     const txt = $('p > strong > span', elm)?.nextSibling;
     if (!txt) return 0;
@@ -94,6 +94,16 @@ export class PsaService {
     return true;
   }
 
+  private getThumbnail(doc: Document): string {
+
+    let thumb = $('.entry-inner > a', doc) as HTMLAnchorElement | null;
+    if (!thumb) {
+      thumb = $('.entry-inner > p > a', doc) as HTMLAnchorElement | null;
+    }
+
+    return thumb?.href ?? 'https://BROKEN.LINK';
+  }
+
   private getShowReleaseNum(name: string) {
 
     const { groups } = this.PSA_RELEASE_NUM_PATTERN.exec(name) ?? {};
@@ -108,14 +118,15 @@ export class PsaService {
 
     const name = $('.sp-head', elm)?.textContent?.trim();
 
+    // dont include release with strike-through names
     if (!name || /[\u0337\u0336\u0335]/.test(name)) return null;
 
     const { season, episode } = this.getShowReleaseNum(name);
 
     return {
       name,
-      sizeMB: this.getShowReleaseSize(elm),
-      exitLink: ($('strong > a', elm) as HTMLAnchorElement).href,
+      sizeMB: this.getReleaseSize(elm),
+      exitLinks: [ ($('strong > a', elm) as HTMLAnchorElement).href ],
       source: this.getShowReleaseSource(elm),
       hasSubtitles: this.hasShowReleaseSubs(elm),
       season,
@@ -123,46 +134,92 @@ export class PsaService {
     };
   }
 
+  private getMovieReleaseInfo(elm: HTMLElement) {
+
+    const txt = elm.textContent;
+    if (!txt) return { sizeMB: 0, source: 'None', hasSubtitles: false };
+
+    const match = /Source : (?<src>\S*)/.exec(txt);
+    const { groups } = /File size : (?<size>(?:\d+|\d+\.\d+)) (?<byte>MB|GB)/.exec(txt) ?? {};
+
+    return {
+      sizeMB: groups ? groups.byte === 'MB' ? parseFloat(groups.size) : parseFloat(groups.size) * 1000 : 0,
+      source: match?.groups?.src ?? 'None',
+      hasSubtitles: /\sText\s/.test(txt)
+    };
+  }
+
+  private getMovieExitLinks(elm: HTMLElement): string[] {
+
+    const anchors = elm.querySelectorAll('a');
+
+    return [...anchors]
+      .filter(anchor => anchor.textContent?.startsWith('Download'))
+      .map(anchor => anchor.href);
+  }
+
+  private createMovieRelease(elm: HTMLElement): PSAMovieRelease | null {
+
+    const name = elm.textContent?.trim();
+    const info = elm.parentElement?.nextElementSibling;
+
+    // dont include release with strike-through names 
+    // TODO(helene): does this even happen with movies?
+    if (!info?.nextElementSibling || !name || /[\u0335-\u0337]/.test(name)) return null;
+
+    const { sizeMB, source, hasSubtitles } = this.getMovieReleaseInfo(info as HTMLElement);
+
+    return {
+      name,
+      sizeMB,
+      source,
+      hasSubtitles,
+      exitLinks: this.getMovieExitLinks(info.nextElementSibling as HTMLElement),
+    };
+  }
+
   private extractContent(root: Element | Document): string {
 
-    let start = $('.entry-inner p', root);
+    let start = $('.entry-inner p', root) as Element | null;
 
     while (!start?.textContent?.trim().length) {
-      start = start?.nextElementSibling as HTMLElement;
+      start = start?.nextElementSibling ?? null;
     }
 
-    return start.textContent;
+    return start?.textContent ?? 'No description';
   }
 
   private serializePSAShow(doc: Document): PSAShow {
 
     return {
-      name: $('.post-title', doc)?.textContent ?? 'No name?',
-      content: this.extractContent(doc),
+      name: $('.post-title', doc)?.textContent ?? 'No show name?',   
       categories: $$('.category a', doc).map(a => a.textContent ?? ''),
+      content: this.extractContent(doc),
+      thumbnail: this.getThumbnail(doc),
       releases: $$('.sp-wrap', doc)
         .map(this.createShowRelease.bind(this))
         .filter((r): r is PSAShowRelease => !!r)
-        .sort(({season: xs, episode: xe}, {season: ys, episode: ye}) => ys - xs === 0 ? ye - xe : ys - xs),
-      thumbnail: ($('.entry-inner > a', doc) as HTMLAnchorElement).href 
+        .sort(({season: xs, episode: xe}, {season: ys, episode: ye}) => ys - xs === 0 ? ye - xe : ys - xs) 
     };
   }
 
   private serializePSAMovie(doc: Document): PSAMovie {
 
     return {
-      name: $('.post-title', doc)?.textContent ?? 'No name?',
+      name: $('.post-title', doc)?.textContent ?? 'No movie name?',
       categories: $$('.category a', doc).map(a => a.textContent ?? ''),
-      thumbnail: ($('.entry-inner > a', doc) as HTMLAnchorElement).href,
-      content: '',
-      releases: []
+      thumbnail: this.getThumbnail(doc),
+      content: this.extractContent(doc),
+      releases: $$('.entry-inner > hr + p > strong', doc)
+        .map(this.createMovieRelease.bind(this))
+        .filter((r): r is PSAMovieRelease => !!r)
     };
   }
 
   getMediaByCategory(category: PSACategory, page = 0): Observable<PSAMedium[]> {
 
     const cacheKey = `${category}-${page}`;
-    if (cacheKey in this.CACHE) return of(this.CACHE[cacheKey]);
+    if (this.CACHE[cacheKey]) return of(this.CACHE[cacheKey]);
 
     const uri = `https://${this.PSA_DOMAIN}/category/${category}/${page > 0 ? `page/${page + 1}/` : ''}`;
     //const uri = `../../assets/dataFallback/page${page}.html`;
