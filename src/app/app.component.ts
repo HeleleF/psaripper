@@ -6,60 +6,67 @@ import { fromEvent, Subscription } from 'rxjs';
 import { IpcRendererEvent } from 'electron/main';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+	selector: 'app-root',
+	templateUrl: './app.component.html',
+	styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
+	title = 'PSARipper';
+	isElectron: boolean;
+	isMaximized = false;
 
-  title = 'PSARipper';
-  isElectron: boolean;
-  isMaximized = false;
+	sub: Subscription | undefined;
 
-  sub: Subscription | undefined;
+	constructor(
+		private translate: TranslateService,
+		private es: ElectronService,
+		private ngZone: NgZone
+	) {
+		this.translate.setDefaultLang('en');
+		this.isElectron = this.es.isElectron;
 
-  constructor(
-    private translate: TranslateService,
-    private es: ElectronService,
-    private ngZone: NgZone
-  ) {
+		console.log(
+			`Run in ${this.isElectron ? 'electron' : 'browser'} with `,
+			AppConfig
+		);
+	}
 
-    this.translate.setDefaultLang('en');
-    this.isElectron = this.es.isElectron;
+	ngOnInit(): void {
+		if (!this.isElectron) return;
 
-    console.log(`Run in ${this.isElectron ? 'electron' : 'browser'} with `, AppConfig);
-  }
+		console.log('app init');
 
-  ngOnInit(): void {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		this.sub = fromEvent<[IpcRendererEvent, boolean]>(
+			this.es.ipcRenderer!,
+			'window-max-restore-toggle'
+		).subscribe({
+			next: ([, maxi]) => {
+				this.ngZone.run(() => {
+					this.isMaximized = maxi;
+				});
+			}
+		});
+	}
 
-    if (!this.isElectron) return;
+	minimizeWindow(): void {
+		this.es.ipcRenderer?.send('cmd-to-main', {
+			command: 'minimize-window'
+		});
+	}
+	maximizeWindow(): void {
+		this.es.ipcRenderer?.send('cmd-to-main', {
+			command: 'maximize-window'
+		});
+	}
+	restoreWindow(): void {
+		this.es.ipcRenderer?.send('cmd-to-main', { command: 'restore-window' });
+	}
+	closeWindow(): void {
+		this.es.ipcRenderer?.send('cmd-to-main', { command: 'close-window' });
+	}
 
-    console.log('app init');
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.sub = fromEvent<[IpcRendererEvent, boolean]>(this.es.ipcRenderer!, 'window-max-restore-toggle').subscribe({
-      next: ([, maxi]) => {
-        this.ngZone.run(() => {
-          this.isMaximized = maxi;
-        });    
-      },
-    });
-  }
-
-  minimizeWindow(): void {
-    this.es.ipcRenderer?.send('cmd-to-main', { command: 'minimize-window' });
-  }
-  maximizeWindow(): void {
-    this.es.ipcRenderer?.send('cmd-to-main', { command: 'maximize-window' });
-  }
-  restoreWindow(): void {
-    this.es.ipcRenderer?.send('cmd-to-main', { command: 'restore-window' });
-  }
-  closeWindow(): void {
-    this.es.ipcRenderer?.send('cmd-to-main', { command: 'close-window' });
-  }
-
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
-  }
+	ngOnDestroy(): void {
+		this.sub?.unsubscribe();
+	}
 }

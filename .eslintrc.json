@@ -1,56 +1,50 @@
 {
-  "root": true,
-  "env": {
-      "browser": true,
-      "node": true,
-      "es2021": true
-  },
-  "ignorePatterns": [
-    "src/*.html",
-    "dist/**/*",
-    "e2e/**/*"
-  ],
-  "overrides": [
-    {
-      "files": ["*.ts"],
-      "extends": [
-        "plugin:@angular-eslint/recommended",
+	"root": true,
+	"env": {
+		"browser": true,
+		"node": true,
+		"es2021": true
+	},
+	"ignorePatterns": [
+		"src/*.html",
+		"dist/**/*",
+		"e2e/**/*",
+		"src/assets/",
+		"node_modules/"
+	],
+	"overrides": [
+		{
+			"files": ["*.ts"],
+			"extends": [
+				"plugin:@angular-eslint/recommended",
 				"plugin:@angular-eslint/template/process-inline-templates",
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:prettier/recommended"
-      ],
-      "parser": "@typescript-eslint/parser",
-      "parserOptions": {
-        "project": [
-          "./tsconfig.serve.json",
-          "./src/tsconfig.app.json",
-          "./src/tsconfig.spec.json",
-          "./e2e/tsconfig.e2e.json"
-        ],
-        "sourceType": "module"
-      },
-      "rules": {
-        "@typescript-eslint/indent": [
-          "error", 2, {
-            "SwitchCase": 1,
-            "CallExpression": {"arguments": "first"},
-            "FunctionExpression": {"parameters": "first"},
-            "FunctionDeclaration": {"parameters": "first"}
-          }
-        ],
-        "@typescript-eslint/no-explicit-any": 0,
-        "@typescript-eslint/no-var-requires": 0,
-        "@typescript-eslint/no-unsafe-call": 0,
-        "@typescript-eslint/no-unsafe-member-access": 0,
-        "@typescript-eslint/no-unsafe-assignment": 0,
-        "@typescript-eslint/no-unsafe-return": 0,
-        "@typescript-eslint/no-floating-promises": 0,
-        "@typescript-eslint/semi": "error",
-        "@angular-eslint/use-injectable-provided-in": "error",
-        "@angular-eslint/no-attribute-decorator": "error",
-        "@angular-eslint/component-selector": [
+				"eslint:recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:@typescript-eslint/recommended-requiring-type-checking",
+				"plugin:prettier/recommended"
+			],
+			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"project": [
+					"./tsconfig.serve.json",
+					"./src/tsconfig.app.json",
+					"./src/tsconfig.spec.json",
+					"./e2e/tsconfig.e2e.json"
+				],
+				"sourceType": "module"
+			},
+			"rules": {
+				"@typescript-eslint/no-explicit-any": 0,
+				"@typescript-eslint/no-var-requires": 0,
+				"@typescript-eslint/no-unsafe-call": 0,
+				"@typescript-eslint/no-unsafe-member-access": 0,
+				"@typescript-eslint/no-unsafe-assignment": 0,
+				"@typescript-eslint/no-unsafe-return": 0,
+				"@typescript-eslint/no-floating-promises": 0,
+				"@typescript-eslint/semi": "error",
+				"@angular-eslint/use-injectable-provided-in": "error",
+				"@angular-eslint/no-attribute-decorator": "error",
+				"@angular-eslint/component-selector": [
 					"error",
 					{
 						"type": "element",
@@ -66,23 +60,23 @@
 						"style": "camelCase"
 					}
 				],
-        "@typescript-eslint/no-empty-function": [
+				"@typescript-eslint/no-empty-function": [
 					"error",
 					{ "allow": ["constructors"] }
 				],
 				"no-console": "warn"
-      }
-    },
-    {
-      "files": ["*.component.html"],
+			}
+		},
+		{
+			"files": ["*.component.html"],
 			"extends": [
 				"plugin:@angular-eslint/template/recommended",
 				"plugin:prettier/recommended"
 			],
-      "rules": {
-          "@angular-eslint/template/banana-in-box": "error",
-          "@angular-eslint/template/no-negated-async": "error"
-      }
-    }
-  ]
+			"rules": {
+				"@angular-eslint/template/banana-in-box": "error",
+				"@angular-eslint/template/no-negated-async": "error"
+			}
+		}
+	]
 }

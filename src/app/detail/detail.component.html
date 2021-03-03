@@ -1,19 +1,21 @@
 <div class="container">
-  <h1 class="title">
-    {{ 'PAGES.DETAIL.TITLE' | translate }}
-  </h1>
-  <pre>{{ settings | json }}</pre>
-  <input type="text" [(ngModel)]="settings.downloadMethod" (change)="saveD()">
+	<h1 class="title">{{ 'PAGES.DETAIL.TITLE' | translate }}</h1>
+	<pre>{{ settings | json }}</pre>
+	<input
+		type="text"
+		[(ngModel)]="settings.downloadMethod"
+		(change)="saveD()"
+	/>
 </div>
 
 <button (click)="openDev()">DEV TOOLS</button>
 
 <mat-form-field>
-  <mat-label>Select an option</mat-label>
-  <mat-select disableRipple value="1" (selectionChange)="reload()">
-    <mat-option>kjlklöklö</mat-option>
-    <mat-option>sdfsdf</mat-option>
-    <mat-option>ghjgfhj</mat-option>
-    <mat-option>hjkhjk</mat-option>
-  </mat-select>
+	<mat-label>Select an option</mat-label>
+	<mat-select disableRipple value="1" (selectionChange)="reload()">
+		<mat-option>kjlklöklö</mat-option>
+		<mat-option>sdfsdf</mat-option>
+		<mat-option>ghjgfhj</mat-option>
+		<mat-option>hjkhjk</mat-option>
+	</mat-select>
 </mat-form-field>

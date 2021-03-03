@@ -1,8 +1,17 @@
 <div class="job-wrapper">
-    <p class="job-nr">{{ jobIndex + 1 }}</p>
-    <p class="job-status" [class.success]="jobData.status == ST['DONE']" [class.failed]="jobData.status == ST['FAILED']" [class.extracting]="jobData.status == ST['STARTING']" >STATUS: {{ ST[jobData.status] }}</p>
-    
-    <p class="job-id">{{ jobData.id }}</p>
-    <p class="job-release-name">{{ jobData.release.name }}</p>
-    <p class="job-error-message" *ngIf="jobData.status == ST['FAILED']">{{ jobData.errorMessage }} <mat-icon>error</mat-icon></p>
+	<p class="job-nr">{{ jobIndex + 1 }}</p>
+	<p
+		class="job-status"
+		[class.success]="jobData.status == ST['DONE']"
+		[class.failed]="jobData.status == ST['FAILED']"
+		[class.extracting]="jobData.status == ST['STARTING']"
+	>
+		STATUS: {{ ST[jobData.status] }}
+	</p>
+
+	<p class="job-id">{{ jobData.id }}</p>
+	<p class="job-release-name">{{ jobData.release.name }}</p>
+	<p class="job-error-message" *ngIf="jobData.status == ST['FAILED']">
+		{{ jobData.errorMessage }} <mat-icon>error</mat-icon>
+	</p>
 </div>

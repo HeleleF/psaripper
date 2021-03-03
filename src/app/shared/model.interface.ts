@@ -1,4 +1,4 @@
 export interface IPCData {
-  command: string;
-  [key: string]: string;
+	command: string;
+	[key: string]: string;
 }

@@ -18,9 +18,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
-import {MatSelectModule} from '@angular/material/select';
-import {MatTabsModule} from '@angular/material/tabs';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { UiScrollModule } from 'ngx-ui-scroll';
@@ -39,47 +39,47 @@ import { PsaJobComponent } from './psa-job/psa-job.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+	return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    DetailComponent,
-    PsaMediaComponent,
-    PsaMediumComponent,
-    PageNotFoundComponent,
-    PsaContentComponent,
-    JoinPipe,
-    PsaReleaseListComponent,
-    PsaJobComponent,
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    MatToolbarModule,
-    MatDialogModule,
-    MatIconModule,
-    MatDividerModule,
-    MatMenuModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatTabsModule,
-    MatExpansionModule,
-    BrowserAnimationsModule,
-    UiScrollModule,
-    //AppRoutingModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    })
-  ],
-  providers: [JoinPipe],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		HomeComponent,
+		DetailComponent,
+		PsaMediaComponent,
+		PsaMediumComponent,
+		PageNotFoundComponent,
+		PsaContentComponent,
+		JoinPipe,
+		PsaReleaseListComponent,
+		PsaJobComponent
+	],
+	imports: [
+		BrowserModule,
+		FormsModule,
+		HttpClientModule,
+		MatToolbarModule,
+		MatDialogModule,
+		MatIconModule,
+		MatDividerModule,
+		MatMenuModule,
+		MatButtonModule,
+		MatSelectModule,
+		MatTabsModule,
+		MatExpansionModule,
+		BrowserAnimationsModule,
+		UiScrollModule,
+		//AppRoutingModule,
+		TranslateModule.forRoot({
+			loader: {
+				provide: TranslateLoader,
+				useFactory: HttpLoaderFactory,
+				deps: [HttpClient]
+			}
+		})
+	],
+	providers: [JoinPipe],
+	bootstrap: [AppComponent]
 })
 export class AppModule {}

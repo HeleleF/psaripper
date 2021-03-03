@@ -1,47 +1,46 @@
 .job-wrapper {
-    background-color: #212121;
-    border: 1px solid #444444;
-    margin: 15px;
-    padding: 8px;
-    border-radius: 15px;
+	background-color: #212121;
+	border: 1px solid #444444;
+	margin: 15px;
+	padding: 8px;
+	border-radius: 15px;
 
-    &:hover {
-        cursor: pointer;
-    }
+	&:hover {
+		cursor: pointer;
+	}
 }
 
 .job-status {
-
-    &.extracting {
-        color: cyan;
-    }
-    &.success {
-        color: greenyellow;
-    }
-    &.failed {
-        color: red;
-    }
+	&.extracting {
+		color: cyan;
+	}
+	&.success {
+		color: greenyellow;
+	}
+	&.failed {
+		color: red;
+	}
 }
 
 .job-id {
-    color: #84a7d2;
-    font-size: small;
+	color: #84a7d2;
+	font-size: small;
 }
 .job-nr {
-    color: #dedbcc;
+	color: #dedbcc;
 
-    font-family: Georgia;
-    font-size: 24px;
-    font-weight: bold;
+	font-family: Georgia;
+	font-size: 24px;
+	font-weight: bold;
 
-    float: right;
+	float: right;
 
-    margin-right: 5px;
-    margin-top: 5px;
+	margin-right: 5px;
+	margin-top: 5px;
 }
 .job-release-name {
-    color: #d8d8d8;
+	color: #d8d8d8;
 }
 .job-error-message {
-    color: red;
+	color: red;
 }

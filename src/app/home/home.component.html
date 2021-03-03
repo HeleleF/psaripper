@@ -1,3 +1,8 @@
 <ul class="joblist">
-  <app-psa-job *ngFor="let job of (jobs$ | async); index as idx" [jobData]="job" [jobIndex]="idx" (click)="removeJob(job.id)"></app-psa-job>
+	<app-psa-job
+		*ngFor="let job of (jobs$ | async); index as idx"
+		[jobData]="job"
+		[jobIndex]="idx"
+		(click)="removeJob(job.id)"
+	></app-psa-job>
 </ul>

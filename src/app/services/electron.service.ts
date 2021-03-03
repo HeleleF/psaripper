@@ -8,30 +8,31 @@ import { Observable, Subject } from 'rxjs';
 import { IPCData } from '../shared/model.interface';
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class ElectronService {
+	public ipcRenderer: typeof ipcRenderer | undefined;
+	private subject$ = new Subject<IPCData>();
 
-  public ipcRenderer: typeof ipcRenderer | undefined;
-  private subject$ = new Subject<IPCData>();
+	get messages$(): Observable<IPCData> {
+		return this.subject$.asObservable();
+	}
 
-  get messages$(): Observable<IPCData> {
-    return this.subject$.asObservable();
-  }
+	get isElectron(): boolean {
+		return /Electron/.test(navigator.userAgent);
+	}
 
-  get isElectron(): boolean {
-    return /Electron/.test(navigator.userAgent);
-  }
+	constructor() {
+		// Conditional imports
+		if (this.isElectron) {
+			this.ipcRenderer = window.require('electron').ipcRenderer;
+			this.ipcRenderer?.on('cmd-from-main', (ev, data: IPCData) =>
+				this.subject$.next(data)
+			);
+		}
+	}
 
-  constructor() {
-    // Conditional imports
-    if (this.isElectron) {
-      this.ipcRenderer = window.require('electron').ipcRenderer;
-      this.ipcRenderer?.on('cmd-from-main', (ev, data: IPCData) => this.subject$.next(data));
-    }
-  }
-
-  sendMessage(data: IPCData): void {
-    this.ipcRenderer?.send('cmd-to-main', data);
-  }
+	sendMessage(data: IPCData): void {
+		this.ipcRenderer?.send('cmd-to-main', data);
+	}
 }

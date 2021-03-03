@@ -2,7 +2,7 @@
  * Alias for `querySelector()`
  */
 export function $(sel: string, doc: Document | Element): HTMLElement | null {
-  return doc.querySelector(sel);
+	return doc.querySelector(sel);
 }
 
 /**
@@ -10,13 +10,19 @@ export function $(sel: string, doc: Document | Element): HTMLElement | null {
 
  */
 export function $$(sel: string, doc: Document | Element): HTMLElement[] {
-  return [...doc.querySelectorAll(sel)] as HTMLElement[];
+	return [...doc.querySelectorAll(sel)] as HTMLElement[];
 }
 
 export function serializeForm(form: HTMLFormElement): string {
-  return Array.from(form.querySelectorAll('input'), i => `${i.name}=${i.value}`).join('&');
+	return Array.from(
+		form.querySelectorAll('input'),
+		(i) => `${i.name}=${i.value}`
+	).join('&');
 }
 
 export function btoa(data: string | number): string {
-  return globalThis?.btoa?.(data.toString()) ?? Buffer.from(data.toString()).toString('base64');
+	return (
+		globalThis?.btoa?.(data.toString()) ??
+		Buffer.from(data.toString()).toString('base64')
+	);
 }

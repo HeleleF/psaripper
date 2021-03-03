@@ -1,9 +1,9 @@
 .container {
-    color: greenyellow
+	color: greenyellow;
 }
 
 ::ng-deep
-  .mat-form-field-type-mat-select:not(.mat-form-field-disabled)
-  .mat-form-field-flex {
-  background-color: red !important;
+	.mat-form-field-type-mat-select:not(.mat-form-field-disabled)
+	.mat-form-field-flex {
+	background-color: red !important;
 }

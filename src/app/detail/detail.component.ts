@@ -4,35 +4,29 @@ import { AppSettings } from '../model/AppSettings.interface';
 import { ElectronService } from '../services/electron.service';
 
 @Component({
-  selector: 'app-detail',
-  templateUrl: './detail.component.html',
-  styleUrls: ['./detail.component.scss']
+	selector: 'app-detail',
+	templateUrl: './detail.component.html',
+	styleUrls: ['./detail.component.scss']
 })
 export class DetailComponent implements OnInit, OnDestroy {
+	settings: AppSettings;
 
-  settings: AppSettings;
+	constructor(private ss: SettingsService, private es: ElectronService) {
+		this.settings = this.ss.getAll();
+	}
 
-  constructor(
-    private ss: SettingsService,
-    private es: ElectronService
-  ) {
+	ngOnInit(): void {}
 
-    this.settings = this.ss.getAll();
-  }
+	ngOnDestroy(): void {
+		this.ss.save();
+	}
 
-  ngOnInit(): void {
-  }
+	saveD(): void {
+		console.log(this.settings);
+		this.ss.update('downloadMethod', this.settings.downloadMethod);
+	}
 
-  ngOnDestroy(): void {
-    this.ss.save();
-  }
-
-  saveD(): void {
-    console.log(this.settings);
-    this.ss.update('downloadMethod', this.settings.downloadMethod);
-  }
-
-  openDev(): void {
-    this.es.ipcRenderer?.send('cmd-to-main', { command: 'open-devtools' });
-  }
+	openDev(): void {
+		this.es.ipcRenderer?.send('cmd-to-main', { command: 'open-devtools' });
+	}
 }

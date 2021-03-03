@@ -2,59 +2,60 @@ import { Injectable } from '@angular/core';
 import { AppSettings, DownloadMethod } from '../model/AppSettings.interface';
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class SettingsService {
+	private cfg: AppSettings;
+	private readonly SETTINGS_KEY = 'userData';
 
-  private cfg: AppSettings;
-  private readonly SETTINGS_KEY = 'userData';
-  
-  constructor() {
+	constructor() {
+		const data = localStorage.getItem(this.SETTINGS_KEY);
+		const defaultData = this.defaultUserData;
 
-    const data = localStorage.getItem(this.SETTINGS_KEY);
-    const defaultData = this.defaultUserData;
+		if (!data) {
+			this.cfg = defaultData;
+			localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(this.cfg));
+			return;
+		}
 
-    if (!data) {
+		// merge with defaults to always guarantee correct settings
+		this.cfg = {
+			...defaultData,
+			...JSON.parse(data)
+		};
+	}
 
-      this.cfg = defaultData;
-      localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(this.cfg));
-      return;
-    }
+	getAll(): AppSettings {
+		return this.cfg;
+	}
 
-    // merge with defaults to always guarantee correct settings
-    this.cfg = {
-      ...defaultData,
-      ...JSON.parse(data)
-    };
-  }
+	private get defaultUserData(): AppSettings {
+		return {
+			linksWhitelist: ['https://mega.nz'],
+			linksBlacklist: [],
+			downloadMethod: DownloadMethod.JD,
+			qualities: '720p',
+			language: 'en'
+		};
+	}
 
-  getAll(): AppSettings {
-    return this.cfg;   
-  }
+	save(): void {
+		localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(this.cfg));
+	}
 
-  private get defaultUserData(): AppSettings {
-    return {
-      linksWhitelist: ['https://mega.nz'],
-      linksBlacklist: [],
-      downloadMethod: DownloadMethod.JD,
-      qualities: '720p',
-      language: 'en'
-    };
-  }
+	get<K extends keyof AppSettings>(key: K): AppSettings[K] {
+		return this.cfg[key];
+	}
 
-  save(): void {
-    localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(this.cfg));
-  }
+	update<K extends keyof AppSettings>(
+		key: K,
+		newValue: AppSettings[K],
+		forceSave = false
+	): AppSettings[K] {
+		this.cfg[key] = newValue;
 
-  get<K extends keyof AppSettings>(key: K): AppSettings[K] {
-    return this.cfg[key];
-  }
+		if (forceSave) this.save();
 
-  update<K extends keyof AppSettings>(key: K, newValue: AppSettings[K], forceSave = false): AppSettings[K] {
-    this.cfg[key] = newValue;
-
-    if (forceSave) this.save();
-
-    return newValue;
-  }
+		return newValue;
+	}
 }
