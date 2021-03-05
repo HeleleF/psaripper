@@ -1,7 +1,7 @@
 import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
-import { extract } from './src/app/shared/message.interface';
 import { IPCData } from './src/app/shared/model.interface';
 import { BrowserWindowConstructorOptions } from 'electron';
+import { extractor } from './src/app/shared/extractor';
 
 let win: BrowserWindow | null = null;
 
@@ -78,7 +78,9 @@ ipcMain.on('cmd-to-main', (ev, data: IPCData) => {
 			break;
 
 		case 'open-window':
-			shell.openExternal(data.link);
+			data.links.forEach((link: string) =>
+				shell.openExternal(link, { activate: false })
+			);
 			break;
 
 		case 'minimize-window':
@@ -107,8 +109,4 @@ ipcMain.on('cmd-to-main', (ev, data: IPCData) => {
 	}
 });
 
-ipcMain.handle('extract', (ev, data: any) => {
-	console.log('Extraction request for', data);
-
-	return extract(data.exitLinks /*, data.name*/);
-});
+ipcMain.handle('extract', (_, data: any) => extractor.add(data));
