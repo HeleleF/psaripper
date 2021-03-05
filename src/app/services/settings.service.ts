@@ -34,6 +34,7 @@ export class SettingsService {
 			linksWhitelist: ['https://mega.nz'],
 			linksBlacklist: [],
 			downloadMethod: DownloadMethod.JD,
+			jdAutoStart: true,
 			qualities: '720p',
 			language: 'en'
 		};

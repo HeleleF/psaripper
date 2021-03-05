@@ -21,13 +21,15 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
 
 	readonly ALL_CATS = PSACategory;
 	category: PSACategory = PSACategory.SHOW;
-	readonly categories: string[];
+	readonly categories: (keyof typeof PSACategory)[];
 
 	private readonly ITEMS_PER_ROW = 4;
 	private readonly ITEMS_PER_PAGE = 14;
 
 	constructor(private ps: PsaService, private modal: MatDialog) {
-		this.categories = Object.keys(PSACategory);
+		this.categories = Object.keys(
+			PSACategory
+		) as (keyof typeof PSACategory)[];
 
 		this.mediaDatasource = new Datasource({
 			get: (startIndex: number, cnt: number) => {
@@ -125,17 +127,10 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
 		this.ps.saveCache();
 	}
 
-	reload(newCategory?: PSACategory): void {
-		if (newCategory) {
-			this.category = newCategory;
-		}
+	reload(clearCache: boolean = false): void {
+		if (clearCache) this.ps.deleteCache();
+
 		console.log(this.category);
-
-		this.mediaDatasource.adapter?.reload(0);
-	}
-
-	clearCache(): void {
-		this.ps.deleteCache();
 		this.mediaDatasource.adapter?.reload(0);
 	}
 

@@ -21,6 +21,8 @@ export class DetailComponent implements OnInit, OnDestroy {
 		this.ss.save();
 	}
 
+	reload(): void {}
+
 	saveD(): void {
 		console.log(this.settings);
 		this.ss.update('downloadMethod', this.settings.downloadMethod);

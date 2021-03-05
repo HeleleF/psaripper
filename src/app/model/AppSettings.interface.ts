@@ -10,6 +10,12 @@ export interface AppSettings {
 	linksWhitelist: string[];
 	linksBlacklist: string[];
 	downloadMethod: DownloadMethod;
+	jdAutoStart: boolean;
 	qualities: Quality;
 	language: 'en' | 'de';
+}
+
+export interface DownloadResult {
+	success: boolean;
+	message?: string;
 }

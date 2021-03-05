@@ -7,3 +7,8 @@ export interface PSAShow {
 	categories: string[];
 	releases: PSAShowRelease[];
 }
+
+export interface EpisodeInfo {
+	season: number;
+	episode: number;
+}

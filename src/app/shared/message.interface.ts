@@ -165,8 +165,6 @@ async function getOuoRedirect(exitLink: string): Promise<string> {
 			validateStatus: (code) => code === 302
 		});
 		if (headers.location?.includes('ouo')) return headers.location;
-
-		// eslint-disable-next-line no-empty
 	} catch (e) {
 		console.log('No 302', e.response);
 	}

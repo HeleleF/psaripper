@@ -9,7 +9,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { $, $$ } from '../shared/utils';
 
 import { PSAMedium } from '../model/PSAMedium.interface';
-import { PSAShow } from '../model/PSAShow.interface';
+import { PSAShow, EpisodeInfo } from '../model/PSAShow.interface';
 import { PSAMovie } from '../model/PSAMovie.interface';
 import { PSACategory } from '../model/PSACategory.enum';
 import { PSAShowRelease, PSAMovieRelease } from '../model/PSARelease.interface';
@@ -27,8 +27,9 @@ export class PsaService {
 
 	private readonly PSA_CACHE_KEY = 'psa_service_key';
 
-	private readonly PSA_RELEASE_SIZE_PATTERN = /(?<size>(?:\d+|\d+\.\d+)) (?<byte>MB|GB)/;
-	private readonly PSA_RELEASE_NUM_PATTERN = /\.S(?<season>\d{2})E(?<episode>\d{2})\./;
+	// \u00A0 matches the &nbsp (non-breaking space) (ascii code 160)
+	private readonly PSA_RELEASE_SIZE_PATTERN = /(?<size>(?:\d+|\d+\.\d+))(?: |\u00A0)(?<byte>MB|GB)/;
+	private readonly PSA_RELEASE_NUM_PATTERN = /\.S(?<season>\d{2})(?:\.COMPLETE|E(?<episode>\d{2}))\./;
 	private CACHE: PSAMediumCache;
 
 	constructor(private http: HttpClient) {
@@ -80,10 +81,9 @@ export class PsaService {
 
 	private getReleaseSize(elm: HTMLElement): number {
 		const txt = $('p > strong > span', elm)?.nextSibling;
-		if (!txt) return 0;
 
 		const { groups } =
-			this.PSA_RELEASE_SIZE_PATTERN.exec(txt.textContent ?? '') ?? {};
+			this.PSA_RELEASE_SIZE_PATTERN.exec(txt?.textContent ?? '') ?? {};
 		if (!groups) return 0;
 
 		return groups.byte === 'MB'
@@ -113,12 +113,14 @@ export class PsaService {
 		return thumb?.href ?? 'https://BROKEN.LINK';
 	}
 
-	private getShowReleaseNum(name: string) {
+	private getShowReleaseNum(name: string): EpisodeInfo | null {
 		const { groups } = this.PSA_RELEASE_NUM_PATTERN.exec(name) ?? {};
 
+		if (!groups) return null;
+
 		return {
-			season: parseInt(groups?.season ?? '99'),
-			episode: parseInt(groups?.episode ?? '99')
+			season: parseInt(groups.season),
+			episode: parseInt(groups.episode ?? 'NaN')
 		};
 	}
 
@@ -128,16 +130,16 @@ export class PsaService {
 		// dont include release with strike-through names
 		if (!name || /[\u0337\u0336\u0335]/.test(name)) return null;
 
-		const { season, episode } = this.getShowReleaseNum(name);
+		const episodeInfo = this.getShowReleaseNum(name);
+		if (!episodeInfo) return null;
 
 		return {
 			name,
 			sizeMB: this.getReleaseSize(elm),
-			exitLinks: [($('strong > a', elm) as HTMLAnchorElement).href],
+			exitLinks: this.getExitLinks(elm),
 			source: this.getShowReleaseSource(elm),
 			hasSubtitles: this.hasShowReleaseSubs(elm),
-			season,
-			episode
+			...episodeInfo
 		};
 	}
 
@@ -161,7 +163,7 @@ export class PsaService {
 		};
 	}
 
-	private getMovieExitLinks(elm: HTMLElement): string[] {
+	private getExitLinks(elm: HTMLElement): string[] {
 		const anchors = elm.querySelectorAll('a');
 
 		return [...anchors]
@@ -187,9 +189,7 @@ export class PsaService {
 			sizeMB,
 			source,
 			hasSubtitles,
-			exitLinks: this.getMovieExitLinks(
-				info.nextElementSibling as HTMLElement
-			)
+			exitLinks: this.getExitLinks(info.nextElementSibling as HTMLElement)
 		};
 	}
 
