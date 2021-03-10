@@ -105,12 +105,17 @@ export class PsaService {
 	}
 
 	private getThumbnail(doc: Document): string {
-		let thumb = $('.entry-inner > a', doc) as HTMLAnchorElement | null;
+		let thumb = ($('.entry-inner > a', doc) as HTMLAnchorElement | null)
+			?.href;
 		if (!thumb) {
-			thumb = $('.entry-inner > p > a', doc) as HTMLAnchorElement | null;
+			thumb = ($('.entry-inner > p > a', doc) as HTMLAnchorElement | null)
+				?.href;
 		}
 
-		return thumb?.href ?? 'https://BROKEN.LINK';
+		return (
+			thumb?.replace(/^(file|http):\/\//, 'https://') ??
+			'https://dummyimage.com/1000x460/090/fff/&text=Thumbnail%20not%20found'
+		);
 	}
 
 	private getShowReleaseNum(name: string): EpisodeInfo | null {
