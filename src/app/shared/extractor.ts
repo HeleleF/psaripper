@@ -71,7 +71,7 @@ class PSAExtractor {
 			const { headers } = await this.ax.get(link, {
 				jar: this.cj,
 				maxRedirects: 0,
-				validateStatus: (code) => code === 302
+				validateStatus: (code) => code < 400
 			});
 
 			result = headers.location;
