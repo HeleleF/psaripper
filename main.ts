@@ -19,21 +19,12 @@ const createWindow = (): BrowserWindow => {
 		frame: false,
 		backgroundColor: '#FFF',
 		webPreferences: {
-			webSecurity: false, // nur an, damit CORS nicht rumstresst, später kann das weg, weil electron dann ausm file läuft
+			webSecurity: !serve, // nur an, damit CORS nicht rumstresst, später kann das weg, weil electron dann ausm file läuft
 			nodeIntegration: true,
 			allowRunningInsecureContent: serve,
 			contextIsolation: false // false if you want to run 2e2 test with Spectron
 		}
 	};
-
-	if (serve) {
-		require('electron-reload')(__dirname, {
-			electron: require(`${__dirname}/node_modules/electron`)
-		});
-	} else {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		windowOptions.webPreferences!.webSecurity = true;
-	}
 
 	// Create the browser window.
 	win = new BrowserWindow(windowOptions);
@@ -42,7 +33,7 @@ const createWindow = (): BrowserWindow => {
 		: win.loadFile('dist/index.html');
 
 	// TODO: muss später natürlich weg
-	win.webContents.openDevTools();
+	if (serve) win.webContents.openDevTools();
 
 	const toggle = () => {
 		const isMaxi = win?.isMaximized();
