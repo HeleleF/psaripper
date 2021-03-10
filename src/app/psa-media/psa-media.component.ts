@@ -19,7 +19,7 @@ import { PsaService } from '../services/psa.service';
 export class PsaMediaComponent implements OnInit, OnDestroy {
 	mediaDatasource: IDatasource;
 
-	readonly ALL_CATS = PSACategory;
+	readonly ALL_CATS: any = PSACategory;
 	category: PSACategory = PSACategory.SHOW;
 	readonly categories: (keyof typeof PSACategory)[];
 
