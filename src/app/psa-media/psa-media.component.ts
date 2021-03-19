@@ -1,10 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { PSACategory } from '../model/PSACategory.enum';
 import { PsaContentComponent } from '../psa-content/psa-content.component';
 
-import { Datasource, IDatasource } from 'ngx-ui-scroll';
+import { Datasource } from 'ngx-ui-scroll';
 
 import { forkJoin, of } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -16,8 +16,8 @@ import { PsaService } from '../services/psa.service';
 	templateUrl: './psa-media.component.html',
 	styleUrls: ['./psa-media.component.scss']
 })
-export class PsaMediaComponent implements OnInit, OnDestroy {
-	mediaDatasource: IDatasource;
+export class PsaMediaComponent implements OnDestroy {
+	mediaDatasource: any;
 
 	readonly ALL_CATS: any = PSACategory;
 	category: PSACategory = PSACategory.SHOW;
@@ -119,8 +119,6 @@ export class PsaMediaComponent implements OnInit, OnDestroy {
 			}
 		});
 	}
-
-	ngOnInit(): void {}
 
 	ngOnDestroy(): void {
 		console.log('were done');
