@@ -1,6 +1,18 @@
 ### PSA Ripper
 
-hier kommt mein gedöns rein
+Learning typescript/node/electron 🧐
+
+## Custom npm script
+
+`npm start` runs `npm-run-all -p ng:serve electron:main`.
+
+1. `ng:serve` and `electron:main` are running in parallel
+2. `ng:serve` builds Angular locally and runs it on localhost. Changing the source will automatically recompile and reload the page.
+    - note we dont pass the `-o` flag, since we dont want the browser to open (we access localhost through electron's window)
+3. `electron:main` starts nodemon, which in turn runs `electron:serve` everytime the electron entrypoint ( the `main.ts` file) changes
+    - note we also use `--watch` to watch for changes to the `src/app/shared` directory, because the files in there are imported in `main.ts`
+4. Every `electron:serve` call runs `tsc` to compile the electron entrypoint to javascript and then runs `electron` with it. We pass the `--serve` flag to signal a development build.
+    - note the command starts with `wait-on tcp:4200`. This is necessary because we cant show the localhost website if it doesnt exist yet (the `ng:serve` isnt done).
 
 # ELECTRON ENTRY POINT
 
@@ -42,10 +54,6 @@ The esm package (`npm install esm`) loads our ACTUAL entry point logic and expor
 This way we can have a fancy ES module as entry point to electron.
 
 ### Created from template:
-
-# Own fonts
-
-muss sein
 
 # Introduction
 
