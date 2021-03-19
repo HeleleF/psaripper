@@ -26,6 +26,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "axios-cookiejar-support": "^1.0.1",
+    "electron-updater": "^4.3.8",
     "esm": "^3.2.25",
     "jsdom": "^16.4.0",
     "tough-cookie": "^4.0.0"

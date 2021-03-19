@@ -2,6 +2,7 @@ import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import { IPCData } from './src/app/shared/model.interface';
 import { BrowserWindowConstructorOptions } from 'electron';
 import { extractor } from './src/app/shared/extractor';
+import { autoUpdater } from 'electron-updater';
 
 let win: BrowserWindow | null = null;
 
@@ -50,7 +51,12 @@ const createWindow = (): BrowserWindow => {
 
 // Added 400 ms to fix the black background issue while using transparent window.
 // More detais at https://github.com/electron/electron/issues/15947
-app.on('ready', () => setTimeout(createWindow, 400));
+app.on('ready', () => {
+	setTimeout(() => {
+		createWindow();
+		autoUpdater.checkForUpdatesAndNotify();
+	}, 400);
+});
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
 		app.quit();
