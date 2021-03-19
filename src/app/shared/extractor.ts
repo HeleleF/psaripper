@@ -8,7 +8,6 @@ import { serializeForm, btoa } from './utils';
 
 class PSAExtractor {
 	private ax: AxiosInstance;
-	private dp: DOMParser;
 	private cj: CookieJar;
 
 	private readonly OUO_PATTERN = /^https?:\/\/ouo\.(io|press)\//i;
@@ -18,8 +17,6 @@ class PSAExtractor {
 	private ouoIndices: number[] = [9, 10, 15, 16, 21];
 
 	constructor() {
-		this.dp = new new JSDOM().window.DOMParser();
-
 		const now = new Date();
 		const utcToday = `${`00${now.getUTCDay()}`.slice(-2)}${`00${
 			now.getUTCMonth() + 1
@@ -47,14 +44,14 @@ class PSAExtractor {
 		this.ax.defaults.withCredentials = true;
 	}
 
-	async postForm(form: HTMLFormElement): Promise<Document> {
+	async postForm(form: HTMLFormElement): Promise<DocumentFragment> {
 		const { data } = await this.ax.post(form.action, serializeForm(form), {
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded'
 			}
 		});
 
-		return this.dp.parseFromString(data, 'text/html');
+		return JSDOM.fragment(data);
 	}
 
 	async getOUORedirect(link: string): Promise<string | undefined> {
@@ -89,7 +86,7 @@ class PSAExtractor {
 
 		// 1. Go to OUO.IO
 		const { data } = await this.ax.get(maybeOuoLink);
-		let doc = this.dp.parseFromString(data, 'text/html');
+		let doc = JSDOM.fragment(data);
 
 		// 2. Find the first form and POST it
 		const formCaptcha = doc.querySelector<HTMLFormElement>('#form-captcha');
