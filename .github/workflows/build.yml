@@ -6,11 +6,11 @@ on:
             - master
 
 jobs:
-	test:
-		runs-on: ubuntu-latest
-		steps:
-		    - name: print stuff
-			- run: echo {{ github.ref }}
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: print stuff
+            - run: echo {{ github.ref }}
     release:
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         runs-on: ${{ matrix.os }}
