@@ -1,19 +1,153 @@
 .expanded-toolbar {
+	justify-content: space-between;
+	align-items: center;
+	z-index: 10;
+	position: fixed;
 
-    justify-content: space-between;
-    align-items: center;
-    z-index: 10;
-    position: relative;
+	top: var(--title-height);
 
-    height: 50px;
+	height: var(--toolbar-height);
+	width: 100%;
+}
 
-    background-color: #26272b;
-  }
-  
-  .toolbar-spacer {
-    flex: 1 1 auto;
-  }
+.toolbar-spacer {
+	flex: 1 1 auto;
+}
 
-  .home-button, .menu-button {
-    color: white;
-  }
+.titlebar {
+	display: block;
+	position: fixed;
+
+	top: 0;
+
+	height: var(--title-height);
+	width: 100%;
+
+	background-color: #696a70;
+}
+
+.titlebar {
+	padding: 4px;
+}
+
+.titlebar #drag-region {
+	width: 100%;
+	height: 100%;
+	-webkit-app-region: drag;
+	-webkit-user-select: none;
+}
+
+#window-controls {
+	display: grid;
+	grid-template-columns: repeat(3, 46px);
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	-webkit-app-region: no-drag;
+}
+
+#window-controls .button {
+	grid-row: 1 / span 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}
+#min-button {
+	grid-column: 1;
+}
+#max-button,
+#restore-button {
+	grid-column: 2;
+}
+#close-button {
+	grid-column: 3;
+}
+
+#window-controls .button {
+	user-select: none;
+}
+#window-controls .button:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+#window-controls .button:active {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+#close-button:hover {
+	background: #e81123 !important;
+}
+#close-button:active {
+	background: #f1707a !important;
+}
+#close-button:active .icon {
+	filter: invert(1);
+}
+
+#restore-button {
+	display: none !important;
+}
+
+.titlebar #drag-region {
+	display: grid;
+	grid-template-columns: auto 138px;
+}
+
+#window-title {
+	grid-column: 1;
+	display: flex;
+	align-items: center;
+	margin-left: 8px;
+	overflow: hidden;
+	font-family: 'Segoe UI', sans-serif;
+	font-size: 12px;
+}
+
+#window-title span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	line-height: 1.5;
+	color: white;
+}
+
+.titlebar.maximized {
+	width: 100%;
+	padding: 0;
+}
+
+.maximized #window-title {
+	margin-left: 12px;
+}
+
+.maximized #restore-button {
+	display: flex !important;
+}
+
+.maximized #max-button {
+	display: none;
+}
+
+/**
+  * Electron has its own title bar, so we have to subtract that from the height
+  */
+.main {
+	height: calc(100% - var(--title-height));
+	margin-top: var(--title-height);
+	overflow-y: auto;
+}
+
+/**
+  * In the browser we dont need that
+  */
+.main.not-electron {
+	height: 100%;
+	margin-top: 0;
+}
+
+.ctrls {
+	width: 100px;
+	float: left;
+}

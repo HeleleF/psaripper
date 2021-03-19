@@ -2,36 +2,37 @@ import { Injectable } from '@angular/core';
 
 // If you import a module but never use any of the imported values other than as TypeScript types,
 // the resulting javascript file will look as if you never imported the module at all.
-import { ipcRenderer, webFrame, remote } from 'electron';
-import * as childProcess from 'child_process';
-import * as fs from 'fs';
+import { ipcRenderer } from 'electron';
+import { Observable, Subject } from 'rxjs';
+
+import { IPCData } from '../shared/model.interface';
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class ElectronService {
-  ipcRenderer: typeof ipcRenderer;
-  webFrame: typeof webFrame;
-  remote: typeof remote;
-  childProcess: typeof childProcess;
-  fs: typeof fs;
-  dp: DOMParser;
+	public ipcRenderer: typeof ipcRenderer | undefined;
+	private subject$ = new Subject<IPCData>();
 
-  get isElectron(): boolean {
-    return !!(window && window.process && window.process.type);
-  }
+	get messages$(): Observable<IPCData> {
+		return this.subject$.asObservable();
+	}
 
-  constructor() {
-    // Conditional imports
-    if (this.isElectron) {
-      this.ipcRenderer = window.require('electron').ipcRenderer;
-      this.webFrame = window.require('electron').webFrame;
+	get isElectron(): boolean {
+		return /Electron/.test(navigator.userAgent);
+	}
 
-      // If you wan to use remote object, pleanse set enableRemoteModule to true in main.ts
-      // this.remote = window.require('electron').remote;
+	constructor() {
+		// Conditional imports
+		if (this.isElectron) {
+			this.ipcRenderer = window.require('electron').ipcRenderer;
+			this.ipcRenderer?.on('cmd-from-main', (ev, data: IPCData) =>
+				this.subject$.next(data)
+			);
+		}
+	}
 
-      this.childProcess = window.require('child_process');
-      this.fs = window.require('fs');
-    }
-  }
+	sendMessage(data: IPCData): void {
+		this.ipcRenderer?.send('cmd-to-main', data);
+	}
 }

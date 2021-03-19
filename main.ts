@@ -1,85 +1,109 @@
-import { app, BrowserWindow, screen } from 'electron';
-import * as path from 'path';
-import * as url from 'url';
+import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
+import { IPCData } from './src/app/shared/model.interface';
+import { BrowserWindowConstructorOptions } from 'electron';
+import { extractor } from './src/app/shared/extractor';
+import { autoUpdater } from 'electron-updater';
 
-let win: BrowserWindow = null;
+let win: BrowserWindow | null = null;
+
 const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+	serve = args.some((val) => val === '--serve');
 
-function createWindow(): BrowserWindow {
+const createWindow = (): BrowserWindow => {
+	const size = screen.getPrimaryDisplay().workAreaSize;
 
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
+	const windowOptions: BrowserWindowConstructorOptions = {
+		x: 0,
+		y: 0,
+		width: size.width,
+		height: size.height,
+		frame: false,
+		backgroundColor: '#FFF',
+		webPreferences: {
+			webSecurity: !serve, //necessary for CORS issues on localhost
+			nodeIntegration: true,
+			allowRunningInsecureContent: serve,
+			contextIsolation: false
+		}
+	};
 
-  // Create the browser window.
-  win = new BrowserWindow({
-    x: 0,
-    y: 0,
-    width: size.width,
-    height: size.height,
-    frame: false,
-    webPreferences: {
-      webSecurity: false,
-      nodeIntegration: true,
-      allowRunningInsecureContent: (serve) ? true : false,
-      contextIsolation: false,  // false if you want to run 2e2 test with Spectron
-      enableRemoteModule : true // true if you want to run 2e2 test  with Spectron or use remote module in renderer context (ie. Angular)
-    },
-  });
+	// Create the browser window.
+	win = new BrowserWindow(windowOptions);
+	serve
+		? win.loadURL('http://localhost:4200')
+		: win.loadFile('dist/index.html');
 
-  if (serve) {
+	if (serve) win.webContents.openDevTools();
 
-    win.webContents.openDevTools();
+	const toggle = () => {
+		const isMaxi = win?.isMaximized();
+		win?.webContents.send('window-max-restore-toggle', isMaxi);
+	};
 
-    require('electron-reload')(__dirname, {
-      electron: require(`${__dirname}/node_modules/electron`)
-    });
-    win.loadURL('http://localhost:4200');
+	win.on('maximize', toggle);
+	win.on('unmaximize', toggle);
+	win.on('closed', () => {
+		win = null;
+	});
 
-  } else {
-    win.loadURL(url.format({
-      pathname: path.join(__dirname, 'dist/index.html'),
-      protocol: 'file:',
-      slashes: true
-    }));
-  }
+	return win;
+};
 
-  // Emitted when the window is closed.
-  win.on('closed', () => {
-    // Dereference the window object, usually you would store window
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null;
-  });
+// Added 400 ms to fix the black background issue while using transparent window.
+// More detais at https://github.com/electron/electron/issues/15947
+app.on('ready', () => {
+	setTimeout(() => {
+		createWindow();
+		autoUpdater.checkForUpdatesAndNotify();
+	}, 400);
+});
+app.on('window-all-closed', () => {
+	if (process.platform !== 'darwin') {
+		app.quit();
+	}
+});
+app.on('activate', () => {
+	if (win === null) {
+		createWindow();
+	}
+});
 
-  return win;
-}
+ipcMain.on('cmd-to-main', (_, data: IPCData) => {
+	switch (data.command) {
+		case 'open-devtools':
+			win?.webContents.openDevTools();
+			break;
 
-try {
-  // This method will be called when Electron has finished
-  // initialization and is ready to create browser windows.
-  // Some APIs can only be used after this event occurs.
-  // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
-  app.on('ready', () => setTimeout(createWindow, 400));
+		case 'open-window':
+			data.links.forEach((link: string) =>
+				shell.openExternal(link, { activate: false })
+			);
+			break;
 
-  // Quit when all windows are closed.
-  app.on('window-all-closed', () => {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-      app.quit();
-    }
-  });
+		case 'minimize-window':
+			win?.minimize();
+			break;
 
-  app.on('activate', () => {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null) {
-      createWindow();
-    }
-  });
+		case 'maximize-window':
+			win?.maximize();
+			break;
 
-} catch (e) {
-  // Catch Error
-  // throw e;
-}
+		case 'restore-window':
+			win?.unmaximize();
+			break;
+
+		case 'close-window':
+			// kann später auch raus
+			if (win?.webContents.isDevToolsOpened())
+				win?.webContents.closeDevTools();
+
+			win?.close();
+			break;
+
+		default:
+			console.log(`Recieved unknown command "${data.command}"`);
+			break;
+	}
+});
+
+ipcMain.handle('extract', (_, data: any) => extractor.add(data));

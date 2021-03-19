@@ -7,17 +7,15 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { PsaMediaComponent } from './psa-media/psa-media.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'psamedia', component: PsaMediaComponent },
-  { path: 'home', component: HomeComponent },
-  { path: 'detail', component: DetailComponent },
-  { path: '**', component: PageNotFoundComponent },
+	{ path: '', redirectTo: 'home', pathMatch: 'full' },
+	{ path: 'psamedia', component: PsaMediaComponent },
+	{ path: 'home', component: HomeComponent },
+	{ path: 'detail', component: DetailComponent },
+	{ path: '**', component: PageNotFoundComponent }
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes),
-  ],
-  exports: [RouterModule]
+	imports: [RouterModule.forRoot(routes)],
+	exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

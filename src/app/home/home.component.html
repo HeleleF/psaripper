@@ -1,9 +1,8 @@
-<div class="container">
-  <h1 class="title">
-    {{ 'PAGES.HOME.TITLE' | translate }}
-  </h1>
-
-  <div>knibbel di barbsen bub</div>
-
-  <a routerLink="/detail">{{ 'PAGES.HOME.GO_TO_DETAIL' | translate }}</a>
-</div>
+<ul class="joblist">
+	<app-psa-job
+		*ngFor="let job of (jobs$ | async); index as idx"
+		[jobData]="job"
+		[jobIndex]="idx"
+		(click)="removeJob(job.id)"
+	></app-psa-job>
+</ul>

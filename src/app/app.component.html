@@ -1,35 +1,139 @@
+<header class="titlebar" *ngIf="isElectron" [class.maximized]="isMaximized">
+	<div id="drag-region">
+		<div id="window-title">
+			<span>{{title}}</span>
+		</div>
+
+		<div id="window-controls">
+			<div class="button" id="min-button" (click)="minimizeWindow()">
+				<img
+					class="icon"
+					srcset="
+						assets/icons/min-w-10.png 1x,
+						assets/icons/min-w-12.png 1.25x,
+						assets/icons/min-w-15.png 1.5x,
+						assets/icons/min-w-15.png 1.75x,
+						assets/icons/min-w-20.png 2x,
+						assets/icons/min-w-20.png 2.25x,
+						assets/icons/min-w-24.png 2.5x,
+						assets/icons/min-w-30.png 3x,
+						assets/icons/min-w-30.png 3.5x
+					"
+					draggable="false"
+				/>
+			</div>
+
+			<div class="button" id="max-button" (click)="maximizeWindow()">
+				<img
+					class="icon"
+					srcset="
+						assets/icons/max-w-10.png 1x,
+						assets/icons/max-w-12.png 1.25x,
+						assets/icons/max-w-15.png 1.5x,
+						assets/icons/max-w-15.png 1.75x,
+						assets/icons/max-w-20.png 2x,
+						assets/icons/max-w-20.png 2.25x,
+						assets/icons/max-w-24.png 2.5x,
+						assets/icons/max-w-30.png 3x,
+						assets/icons/max-w-30.png 3.5x
+					"
+					draggable="false"
+				/>
+			</div>
+
+			<div class="button" id="restore-button" (click)="restoreWindow()">
+				<img
+					class="icon"
+					srcset="
+						assets/icons/restore-w-10.png 1x,
+						assets/icons/restore-w-12.png 1.25x,
+						assets/icons/restore-w-15.png 1.5x,
+						assets/icons/restore-w-15.png 1.75x,
+						assets/icons/restore-w-20.png 2x,
+						assets/icons/restore-w-20.png 2.25x,
+						assets/icons/restore-w-24.png 2.5x,
+						assets/icons/restore-w-30.png 3x,
+						assets/icons/restore-w-30.png 3.5x
+					"
+					draggable="false"
+				/>
+			</div>
+
+			<div class="button" id="close-button" (click)="closeWindow()">
+				<img
+					class="icon"
+					srcset="
+						assets/icons/close-w-10.png 1x,
+						assets/icons/close-w-12.png 1.25x,
+						assets/icons/close-w-15.png 1.5x,
+						assets/icons/close-w-15.png 1.75x,
+						assets/icons/close-w-20.png 2x,
+						assets/icons/close-w-20.png 2.25x,
+						assets/icons/close-w-24.png 2.5x,
+						assets/icons/close-w-30.png 3x,
+						assets/icons/close-w-30.png 3.5x
+					"
+					draggable="false"
+				/>
+			</div>
+		</div>
+	</div>
+</header>
+<!--
 <mat-toolbar class="expanded-toolbar mat-elevation-z10">
 
-    <!-- Left side TODO: hier kommt das main logo der seite hin-->
-    <span>
-      <button class="home-button" mat-button routerLink="/home">{{title}}</button>
-    </span>
-  
-    <!-- füllt den platz in der mitte aus-->
-    <span class="toolbar-spacer"></span>
-  
-  
-    <!-- vertical burger rechts -->
-    <button class="menu-button" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu" [disabled]="false">
-      <mat-icon>more_vert</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-  
-        <button mat-menu-item routerLink="/psamedia">
-            <mat-icon>settings</mat-icon>
-            <span>media</span>
-          </button>
-  
-      <mat-divider></mat-divider>
-   
-      <button mat-menu-item routerLink="/detail">
-        <mat-icon>settings</mat-icon>
-        <span>Settings</span>
-      </button>
-  
-    </mat-menu>
-  
-  
-  </mat-toolbar>
+  <span>
+    <button class="home-button" mat-button routerLink="/home">{{title}}</button>
+  </span>
 
-<router-outlet></router-outlet>
+  <span class="toolbar-spacer"></span>
+
+
+  <button class="menu-button" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu" [disabled]="false">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+
+      <button mat-menu-item routerLink="/psamedia">
+          <mat-icon>settings</mat-icon>
+          <span>media</span>
+        </button>
+
+    <mat-divider></mat-divider>
+ 
+    <button mat-menu-item routerLink="/detail">
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </button>
+
+  </mat-menu>
+
+
+</mat-toolbar>
+<div class="main">
+  <router-outlet></router-outlet>
+</div>
+-->
+
+<mat-tab-group
+	class="main"
+	[class.not-electron]="!isElectron"
+	animationDuration="0ms"
+>
+	<mat-tab label="Home">
+		<ng-template matTabContent>
+			<app-home></app-home>
+		</ng-template>
+	</mat-tab>
+	<mat-tab label="Settings">
+		<ng-template matTabContent>
+			<app-detail></app-detail>
+		</ng-template>
+	</mat-tab>
+	<mat-tab label="PSA Media">
+		<ng-template matTabContent>
+			<app-psa-media *ngIf="isElectron"></app-psa-media>
+			<div *ngIf="!isElectron">Does not work in browser</div>
+		</ng-template>
+	</mat-tab>
+</mat-tab-group>

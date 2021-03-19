@@ -1,25 +1,17 @@
 {
-  "compilerOptions": {
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "target": "es2019",
-    "types": [
-      "node"
-    ],
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ]
-  },
-  "files": [
-    "main.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+	"compilerOptions": {
+		"sourceMap": true,
+		"declaration": false,
+		"moduleResolution": "node",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"removeComments": true,
+		"strict": true,
+		"target": "es2019",
+		"types": ["node"],
+		"lib": ["ESNext", "DOM", "DOM.Iterable"]
+	},
+	"files": ["main.ts"],
+	"include": ["src/app/shared/*.ts"],
+	"exclude": ["node_modules", "**/*.spec.ts"]
 }
