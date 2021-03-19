@@ -19,10 +19,10 @@ const createWindow = (): BrowserWindow => {
 		frame: false,
 		backgroundColor: '#FFF',
 		webPreferences: {
-			webSecurity: !serve, // nur an, damit CORS nicht rumstresst, später kann das weg, weil electron dann ausm file läuft
+			webSecurity: !serve, //necessary for CORS issues on localhost
 			nodeIntegration: true,
 			allowRunningInsecureContent: serve,
-			contextIsolation: false // false if you want to run 2e2 test with Spectron
+			contextIsolation: false
 		}
 	};
 
@@ -32,7 +32,6 @@ const createWindow = (): BrowserWindow => {
 		? win.loadURL('http://localhost:4200')
 		: win.loadFile('dist/index.html');
 
-	// TODO: muss später natürlich weg
 	if (serve) win.webContents.openDevTools();
 
 	const toggle = () => {
@@ -49,7 +48,8 @@ const createWindow = (): BrowserWindow => {
 	return win;
 };
 
-// Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
+// Added 400 ms to fix the black background issue while using transparent window.
+// More detais at https://github.com/electron/electron/issues/15947
 app.on('ready', () => setTimeout(createWindow, 400));
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
@@ -62,7 +62,7 @@ app.on('activate', () => {
 	}
 });
 
-ipcMain.on('cmd-to-main', (ev, data: IPCData) => {
+ipcMain.on('cmd-to-main', (_, data: IPCData) => {
 	switch (data.command) {
 		case 'open-devtools':
 			win?.webContents.openDevTools();
