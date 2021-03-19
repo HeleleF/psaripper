@@ -12,5 +12,6 @@
 		"lib": ["ESNext", "DOM", "DOM.Iterable"]
 	},
 	"files": ["main.ts"],
+	"include": ["src/app/shared/*.ts"],
 	"exclude": ["node_modules", "**/*.spec.ts"]
 }
