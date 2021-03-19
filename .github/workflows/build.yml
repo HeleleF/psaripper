@@ -6,12 +6,7 @@ on:
             - master
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        steps:
-            - run: echo ${{ github.ref }}
     release:
-        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         runs-on: ${{ matrix.os }}
 
         strategy:
@@ -26,7 +21,8 @@ jobs:
               uses: actions/setup-node@v2
               with:
                   node-version: 14
-
+            - name: Print ref
+                - run: echo ${{ github.ref }}
             - name: Build/release Electron app
               uses: samuelmeuli/action-electron-builder@v1
               with:
