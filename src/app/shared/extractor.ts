@@ -33,10 +33,10 @@ class PSAExtractor {
 				'User-Agent':
 					'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15'
 			},
-			proxy: {
-				host: '127.0.0.1',
-				port: 8888
-			},
+			// proxy: {
+			// 	host: '127.0.0.1',
+			// 	port: 8888
+			// },
 			maxRedirects: 3
 		});
 		axiosCookieJarSupport(this.ax);
