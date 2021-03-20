@@ -4,10 +4,12 @@ import { BrowserWindowConstructorOptions } from 'electron';
 import { extractor } from './src/app/shared/extractor';
 import { autoUpdater } from 'electron-updater';
 
-let win: BrowserWindow | null = null;
+let mainWindow: BrowserWindow | null = null;
 
 const args = process.argv.slice(1),
 	isDev = args.some((val) => val === '--dev');
+
+const instanceLock = app.requestSingleInstanceLock();
 
 const createWindow = (): BrowserWindow => {
 	const size = screen.getPrimaryDisplay().workAreaSize;
@@ -28,82 +30,91 @@ const createWindow = (): BrowserWindow => {
 	};
 
 	// Create the browser window.
-	win = new BrowserWindow(windowOptions);
+	mainWindow = new BrowserWindow(windowOptions);
 	isDev
-		? win.loadURL('http://localhost:4200')
-		: win.loadFile('dist/index.html');
+		? mainWindow.loadURL('http://localhost:4200')
+		: mainWindow.loadFile('dist/index.html');
 
-	if (isDev) win.webContents.openDevTools();
+	if (isDev) mainWindow.webContents.openDevTools();
 
 	const toggle = () => {
-		const isMaxi = win?.isMaximized();
-		win?.webContents.send('window-max-restore-toggle', isMaxi);
+		const isMaxi = mainWindow?.isMaximized();
+		mainWindow?.webContents.send('window-max-restore-toggle', isMaxi);
 	};
 
-	win.on('maximize', toggle);
-	win.on('unmaximize', toggle);
-	win.on('closed', () => {
-		win = null;
+	mainWindow.on('maximize', toggle);
+	mainWindow.on('unmaximize', toggle);
+	mainWindow.on('closed', () => {
+		mainWindow = null;
 	});
 
-	return win;
+	ipcMain.on('cmd-to-main', (_, data: IPCData) => {
+		switch (data.command) {
+			case 'open-devtools':
+				mainWindow?.webContents.openDevTools();
+				break;
+
+			case 'open-window':
+				data.links.forEach((link: string) =>
+					shell.openExternal(link, { activate: false })
+				);
+				break;
+
+			case 'minimize-window':
+				mainWindow?.minimize();
+				break;
+
+			case 'maximize-window':
+				mainWindow?.maximize();
+				break;
+
+			case 'restore-window':
+				mainWindow?.unmaximize();
+				break;
+
+			case 'close-window':
+				// kann später auch raus
+				if (mainWindow?.webContents.isDevToolsOpened())
+					mainWindow?.webContents.closeDevTools();
+
+				mainWindow?.close();
+				break;
+
+			default:
+				console.log(`Recieved unknown command "${data.command}"`);
+				break;
+		}
+	});
+
+	ipcMain.handle('extract', (_, data: any) => extractor.add(data));
+
+	return mainWindow;
 };
 
-// Added 400 ms to fix the black background issue while using transparent window.
-// More detais at https://github.com/electron/electron/issues/15947
-app.on('ready', () => {
-	setTimeout(() => {
-		createWindow();
-		autoUpdater.checkForUpdatesAndNotify();
-	}, 400);
-});
+if (!instanceLock) {
+	app.quit();
+} else {
+	app.on('ready', () => {
+		setTimeout(() => {
+			createWindow();
+			autoUpdater.checkForUpdatesAndNotify();
+		}, 400);
+	});
+	app.on('second-instance', () => {
+		if (mainWindow) {
+			if (mainWindow.isMinimized()) mainWindow.restore();
+			mainWindow.focus();
+		}
+	});
+}
+
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
 		app.quit();
 	}
 });
 app.on('activate', () => {
-	if (win === null) {
+	if (mainWindow === null) {
 		createWindow();
 	}
 });
-
-ipcMain.on('cmd-to-main', (_, data: IPCData) => {
-	switch (data.command) {
-		case 'open-devtools':
-			win?.webContents.openDevTools();
-			break;
-
-		case 'open-window':
-			data.links.forEach((link: string) =>
-				shell.openExternal(link, { activate: false })
-			);
-			break;
-
-		case 'minimize-window':
-			win?.minimize();
-			break;
-
-		case 'maximize-window':
-			win?.maximize();
-			break;
-
-		case 'restore-window':
-			win?.unmaximize();
-			break;
-
-		case 'close-window':
-			// kann später auch raus
-			if (win?.webContents.isDevToolsOpened())
-				win?.webContents.closeDevTools();
-
-			win?.close();
-			break;
-
-		default:
-			console.log(`Recieved unknown command "${data.command}"`);
-			break;
-	}
-});
-
-ipcMain.handle('extract', (_, data: any) => extractor.add(data));
