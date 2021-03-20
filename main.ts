@@ -7,7 +7,7 @@ import { autoUpdater } from 'electron-updater';
 let win: BrowserWindow | null = null;
 
 const args = process.argv.slice(1),
-	serve = args.some((val) => val === '--serve');
+	isDev = args.some((val) => val === '--dev');
 
 const createWindow = (): BrowserWindow => {
 	const size = screen.getPrimaryDisplay().workAreaSize;
@@ -20,20 +20,20 @@ const createWindow = (): BrowserWindow => {
 		frame: false,
 		backgroundColor: '#FFF',
 		webPreferences: {
-			webSecurity: !serve, //necessary for CORS issues on localhost
+			webSecurity: !isDev, //necessary for CORS issues on localhost
 			nodeIntegration: true,
-			allowRunningInsecureContent: serve,
+			allowRunningInsecureContent: isDev,
 			contextIsolation: false
 		}
 	};
 
 	// Create the browser window.
 	win = new BrowserWindow(windowOptions);
-	serve
+	isDev
 		? win.loadURL('http://localhost:4200')
 		: win.loadFile('dist/index.html');
 
-	if (serve) win.webContents.openDevTools();
+	if (isDev) win.webContents.openDevTools();
 
 	const toggle = () => {
 		const isMaxi = win?.isMaximized();
