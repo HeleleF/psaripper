@@ -10,7 +10,6 @@ const args = process.argv.slice(1),
 	isDev = args.some((val) => val === '--dev');
 
 const instanceLock = app.requestSingleInstanceLock();
-
 const createWindow = (): BrowserWindow => {
 	const size = screen.getPrimaryDisplay().workAreaSize;
 
