@@ -5,7 +5,6 @@
 	},
 	"files": [
 		"**/*",
-		"node_modules/esm",
 		"!**/*.ts",
 		"!*.code-workspace",
 		"!LICENSE.md",

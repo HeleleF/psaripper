@@ -4,8 +4,8 @@
   "description": "Angular 11 with Electron (Typescript + SASS + Hot Reload)",
   "main": "mainElectron.js",
   "author": {
-	  "name": "HeleleF",
-	  "email": "cr.rebbelin@gmail.com"
+    "name": "HeleleF",
+    "email": "cr.rebbelin@gmail.com"
   },
   "private": true,
   "scripts": {
@@ -27,7 +27,9 @@
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write ."
   },
-  "dependencies": {},
+  "dependencies": {
+    "esm": "^3.2.25"
+  },
   "devDependencies": {
     "@angular-builders/custom-webpack": "11.0.0",
     "@angular-devkit/build-angular": "0.1100.7",
@@ -71,7 +73,6 @@
     "eslint-plugin-jsdoc": "^32.3.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "^3.3.1",
-    "esm": "^3.2.25",
     "jasmine-core": "3.6.0",
     "jasmine-spec-reporter": "6.0.0",
     "jsdom": "^16.5.1",
