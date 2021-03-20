@@ -39,7 +39,7 @@ const createWindow = (): BrowserWindow => {
 		? splash.loadFile('src/assets/splash/splash.html')
 		: splash.loadFile('dist/assets/splash/splash.html');
 
-	//if (isDev) mainWindow.webContents.openDevTools();
+	if (isDev) mainWindow.webContents.openDevTools();
 
 	isDev
 		? mainWindow.loadURL('http://localhost:4200')
