@@ -1,6 +1,5 @@
 import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import { IPCData } from './src/app/shared/model.interface';
-import { BrowserWindowConstructorOptions } from 'electron';
 import { extractor } from './src/app/shared/extractor';
 import { autoUpdater } from 'electron-updater';
 
@@ -13,7 +12,8 @@ const instanceLock = app.requestSingleInstanceLock();
 const createWindow = (): BrowserWindow => {
 	const size = screen.getPrimaryDisplay().workAreaSize;
 
-	const windowOptions: BrowserWindowConstructorOptions = {
+	// Create the browser window.
+	mainWindow = new BrowserWindow({
 		x: 0,
 		y: 0,
 		width: size.width,
@@ -25,16 +25,32 @@ const createWindow = (): BrowserWindow => {
 			nodeIntegration: true,
 			allowRunningInsecureContent: isDev,
 			contextIsolation: false
-		}
-	};
+		},
+		show: false
+	});
 
-	// Create the browser window.
-	mainWindow = new BrowserWindow(windowOptions);
+	const splash = new BrowserWindow({
+		width: 810,
+		height: 610,
+		frame: false,
+		transparent: true
+	});
+	isDev
+		? splash.loadFile('src/assets/splash/splash.html')
+		: splash.loadFile('dist/assets/splash/splash.html');
+
+	//if (isDev) mainWindow.webContents.openDevTools();
+
 	isDev
 		? mainWindow.loadURL('http://localhost:4200')
 		: mainWindow.loadFile('dist/index.html');
 
-	if (isDev) mainWindow.webContents.openDevTools();
+	mainWindow.once('ready-to-show', () => {
+		setTimeout(() => {
+			splash.destroy();
+			mainWindow?.show();
+		}, 3000);
+	});
 
 	const toggle = () => {
 		const isMaxi = mainWindow?.isMaximized();
@@ -94,16 +110,12 @@ if (!instanceLock) {
 	app.quit();
 } else {
 	app.on('ready', () => {
-		setTimeout(() => {
-			createWindow();
-			autoUpdater.checkForUpdatesAndNotify();
-		}, 400);
+		createWindow();
+		autoUpdater.checkForUpdatesAndNotify();
 	});
 	app.on('second-instance', () => {
-		if (mainWindow) {
-			if (mainWindow.isMinimized()) mainWindow.restore();
-			mainWindow.focus();
-		}
+		if (mainWindow?.isMinimized()) mainWindow.restore();
+		mainWindow?.focus();
 	});
 }
 

@@ -18,7 +18,7 @@ class PSAExtractor {
 
 	constructor() {
 		const now = new Date();
-		const utcToday = `${`00${now.getUTCDay()}`.slice(-2)}${`00${
+		const utcToday = `${`00${now.getUTCDate()}`.slice(-2)}${`00${
 			now.getUTCMonth() + 1
 		}`.slice(-2)}${now.getUTCFullYear().toString().slice(-2)}`;
 
