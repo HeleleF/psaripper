@@ -21,9 +21,14 @@
 		"!tsconfig.json",
 		"!tslint.json"
 	],
+	"nsis": {
+		"allowToChangeInstallationDirectory": true,
+		"deleteAppDataOnUninstall": true,
+		"createDesktopShortcut": true
+	},
 	"win": {
 		"icon": "dist/assets/icons/favicon.256x256.png",
-		"target": ["nsis"]
+		"target": "nsis"
 	},
 	"mac": {
 		"icon": "dist/assets/icons/favicon.512x512.png",
