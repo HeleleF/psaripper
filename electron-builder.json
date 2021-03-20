@@ -5,6 +5,7 @@
 	},
 	"files": [
 		"**/*",
+		"node_modules/esm",
 		"!**/*.ts",
 		"!*.code-workspace",
 		"!LICENSE.md",
@@ -22,6 +23,7 @@
 		"!tslint.json"
 	],
 	"nsis": {
+		"oneClick": false,
 		"allowToChangeInstallationDirectory": true,
 		"deleteAppDataOnUninstall": true,
 		"createDesktopShortcut": true

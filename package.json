@@ -3,6 +3,10 @@
   "version": "0.0.6",
   "description": "Angular 11 with Electron (Typescript + SASS + Hot Reload)",
   "main": "mainElectron.js",
+  "author": {
+	  "name": "HeleleF",
+	  "email": "cr.rebbelin@gmail.com"
+  },
   "private": true,
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
@@ -16,7 +20,7 @@
     "electron:main": "nodemon --exec \"npm run electron:dev\" -e ts --watch main.ts --watch src/app/shared",
     "electron:dev": "wait-on tcp:4200 && npm run electron:tsc && electron ./mainElectron.js --dev",
     "electron:local": "electron ./mainElectron.js",
-    "electron:build": "npm run build:prod && electron-builder build",
+    "electron:build": "electron-builder build",
     "test": "ng test --watch=false",
     "test:watch": "ng test",
     "lint": "eslint . --fix",
@@ -32,7 +36,7 @@
     "@angular-eslint/template-parser": "^1.2.0",
     "@angular/animations": "^11.0.9",
     "@angular/cdk": "^11.0.4",
-    "@angular/cli": "11.0.7",
+    "@angular/cli": "^11.0.7",
     "@angular/common": "11.0.9",
     "@angular/compiler": "11.0.9",
     "@angular/compiler-cli": "11.0.9",
@@ -63,6 +67,9 @@
     "electron-updater": "^4.3.8",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsdoc": "^32.3.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "^3.3.1",
     "esm": "^3.2.25",
     "jasmine-core": "3.6.0",
