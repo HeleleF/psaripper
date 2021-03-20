@@ -18,7 +18,7 @@ class PSAExtractor {
 
 	constructor() {
 		const now = new Date();
-		const utcToday = `${`00${now.getUTCDay()}`.slice(-2)}${`00${
+		const utcToday = `${`00${now.getUTCDate()}`.slice(-2)}${`00${
 			now.getUTCMonth() + 1
 		}`.slice(-2)}${now.getUTCFullYear().toString().slice(-2)}`;
 
@@ -33,10 +33,10 @@ class PSAExtractor {
 				'User-Agent':
 					'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15'
 			},
-			// proxy: {
-			// 	host: '127.0.0.1',
-			// 	port: 8888
-			// },
+			proxy: {
+				host: '127.0.0.1',
+				port: 8888
+			},
 			maxRedirects: 3
 		});
 		axiosCookieJarSupport(this.ax);
