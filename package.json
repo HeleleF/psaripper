@@ -1,6 +1,6 @@
 {
   "name": "angular-electron",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Angular 11 with Electron (Typescript + SASS + Hot Reload)",
   "main": "mainElectron.js",
   "author": {
