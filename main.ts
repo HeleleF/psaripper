@@ -46,10 +46,8 @@ const createWindow = (): BrowserWindow => {
 		: mainWindow.loadFile('dist/index.html');
 
 	mainWindow.once('ready-to-show', () => {
-		setTimeout(() => {
-			splash.destroy();
-			mainWindow?.show();
-		}, 3000);
+		splash.destroy();
+		mainWindow?.show();
 	});
 
 	const toggle = () => {
