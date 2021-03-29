@@ -105,8 +105,12 @@ export class PsaService {
 	}
 
 	private getThumbnail(doc: Document): string {
-		let thumb = ($('.entry-inner > a', doc) as HTMLAnchorElement | null)
-			?.href;
+		let thumb = ($('.entry-inner > img', doc) as HTMLImageElement | null)
+			?.src;
+		if (!thumb) {
+			thumb = ($('.entry-inner > a', doc) as HTMLAnchorElement | null)
+				?.href;
+		}
 		if (!thumb) {
 			thumb = ($('.entry-inner > p > a', doc) as HTMLAnchorElement | null)
 				?.href;
