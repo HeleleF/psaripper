@@ -4,6 +4,20 @@
 
 Learning typescript/node/electron 🧐
 
+## Create new release
+
+1. Create new branch and implement awesome new stuff
+2. When everything is commited, update the version field in package.json like this: `"version": "0.0.5"` -> `"version": "0.0.6"`
+3. Create a new tag for this version `git tag v0.0.6` and push all `git push && git push --tags`
+4. Create a pull request
+5. When the PR is merged into master, github actions will build the new version[^1] and upload it to github releases as a draft
+6. Go to releases page and edit the draft to add a description and stuff.
+7. Save draft as release
+8. ???
+9. Profit!
+
+[^1]: Currently only for windows, but linux and mac can easily be added in `strategy->matrix->os`.
+
 ## Custom npm script
 
 `npm start` runs `npm-run-all -p ng:serve electron:main`.

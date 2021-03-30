@@ -2,6 +2,10 @@ import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import { IPCData } from './src/app/shared/model.interface';
 import { extractor } from './src/app/shared/extractor';
 import { autoUpdater } from 'electron-updater';
+import LOG from 'electron-log';
+
+autoUpdater.logger = LOG;
+LOG.info('App starting...');
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -94,7 +98,7 @@ const createWindow = (): BrowserWindow => {
 				break;
 
 			default:
-				console.log(`Recieved unknown command "${data.command}"`);
+				LOG.warn(`Recieved unknown command "${data.command}"`);
 				break;
 		}
 	});
