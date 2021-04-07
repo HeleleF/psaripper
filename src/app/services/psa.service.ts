@@ -108,6 +108,10 @@ export class PsaService {
 		let thumb = ($('.entry-inner > img', doc) as HTMLImageElement | null)
 			?.src;
 		if (!thumb) {
+			thumb = ($('.entry-inner img[alt]', doc) as HTMLImageElement | null)
+				?.src;
+		}
+		if (!thumb) {
 			thumb = ($('.entry-inner > a', doc) as HTMLAnchorElement | null)
 				?.href;
 		}
