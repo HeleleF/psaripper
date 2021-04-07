@@ -22,7 +22,7 @@ interface PSAMediumCache {
 	providedIn: 'root'
 })
 export class PsaService {
-	private PSA_DOMAIN = 'psa.one';
+	private PSA_DOMAIN = 'x265.club';
 	private dp: DOMParser;
 
 	private readonly PSA_CACHE_KEY = 'psa_service_key';

@@ -25,7 +25,7 @@ class PSAExtractor {
 		this.cj = new CookieJar();
 		this.cj.setCookieSync(
 			`LstVstD=${encodeURIComponent(btoa(utcToday))}; path=/; secure`,
-			'https://psa.one/'
+			'https://x265.club/'
 		);
 
 		this.ax = axios.create({
