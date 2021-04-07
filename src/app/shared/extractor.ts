@@ -14,7 +14,7 @@ class PSAExtractor {
 	/**
 	 * Known values for the `VstCnt` cookie that will redirect to an OUO site
 	 */
-	private ouoIndices: number[] = [9, 10, 15, 16, 21];
+	private ouoIndices: number[] = [8, 9, 10, 15, 16, 21, 23];
 
 	constructor() {
 		const now = new Date();
