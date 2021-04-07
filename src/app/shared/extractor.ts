@@ -5,6 +5,7 @@ import { CookieJar, JSDOM } from 'jsdom';
 
 import { PSAMovieRelease, PSAShowRelease } from '../model/PSARelease.interface';
 import { serializeForm, btoa } from './utils';
+import LOG from 'electron-log';
 
 class PSAExtractor {
 	private ax: AxiosInstance;
@@ -14,7 +15,7 @@ class PSAExtractor {
 	/**
 	 * Known values for the `VstCnt` cookie that will redirect to an OUO site
 	 */
-	private ouoIndices: number[] = [9, 10, 15, 16, 21];
+	private ouoIndices: number[] = [8, 9, 10, 15, 16, 21, 23];
 
 	constructor() {
 		const now = new Date();
@@ -25,7 +26,7 @@ class PSAExtractor {
 		this.cj = new CookieJar();
 		this.cj.setCookieSync(
 			`LstVstD=${encodeURIComponent(btoa(utcToday))}; path=/; secure`,
-			'https://psa.one/'
+			'https://x265.club/'
 		);
 
 		this.ax = axios.create({
@@ -63,7 +64,7 @@ class PSAExtractor {
 				new URL(link).origin
 			);
 
-			console.log(`Trying ${this.ouoIndices[i]}`);
+			LOG.info(`Trying ${this.ouoIndices[i]}`);
 
 			const { headers } = await this.ax.get(link, {
 				jar: this.cj,
@@ -91,7 +92,7 @@ class PSAExtractor {
 		// 2. Find the first form and POST it
 		const formCaptcha = doc.querySelector<HTMLFormElement>('#form-captcha');
 		if (!formCaptcha) {
-			console.log('No captcha form!');
+			LOG.info('No captcha form!');
 			return [];
 		}
 		doc = await this.postForm(formCaptcha);
@@ -99,7 +100,7 @@ class PSAExtractor {
 		// 3. Find the second form and POST it
 		const formGo = doc.querySelector<HTMLFormElement>('#form-go');
 		if (!formGo) {
-			console.log('No go form!');
+			LOG.info('No go form!');
 			return [];
 		}
 		doc = await this.postForm(formGo);
@@ -121,7 +122,7 @@ class PSAExtractor {
 	}
 
 	async add(release: PSAShowRelease | PSAMovieRelease): Promise<string[]> {
-		console.log(
+		LOG.info(
 			`Adding release ${release.name} with ${release.exitLinks.length} link(s)`
 		);
 

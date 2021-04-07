@@ -22,7 +22,7 @@ interface PSAMediumCache {
 	providedIn: 'root'
 })
 export class PsaService {
-	private PSA_DOMAIN = 'psa.one';
+	private PSA_DOMAIN = 'x265.club';
 	private dp: DOMParser;
 
 	private readonly PSA_CACHE_KEY = 'psa_service_key';
@@ -107,6 +107,10 @@ export class PsaService {
 	private getThumbnail(doc: Document): string {
 		let thumb = ($('.entry-inner > img', doc) as HTMLImageElement | null)
 			?.src;
+		if (!thumb) {
+			thumb = ($('.entry-inner img[alt]', doc) as HTMLImageElement | null)
+				?.src;
+		}
 		if (!thumb) {
 			thumb = ($('.entry-inner > a', doc) as HTMLAnchorElement | null)
 				?.href;
