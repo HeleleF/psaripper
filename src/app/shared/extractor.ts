@@ -66,13 +66,19 @@ class PSAExtractor {
 
 			LOG.info(`Trying ${this.ouoIndices[i]}`);
 
-			const { headers } = await this.ax.get(link, {
+			const { data, headers } = await this.ax.get<string>(link, {
 				jar: this.cj,
 				maxRedirects: 0,
 				validateStatus: (code) => code < 400
 			});
 
 			result = headers.location;
+
+			if (!result) {
+				const match = /action=(?<redirect>\S+)/.exec(data);
+				result = match?.groups?.redirect;
+				LOG.info(`No 301 redirect, recieved ${result ?? 'Nothing'}`);
+			}
 		} while (
 			!result?.match(this.OUO_PATTERN) &&
 			++i < this.ouoIndices.length
