@@ -77,7 +77,7 @@ class PSAExtractor {
 			if (!result) {
 				const match = /action=(?<redirect>\S+)/.exec(data);
 				result = match?.groups?.redirect;
-				console.log(result);
+				LOG.info(`No 301 redirect, recieved ${result ?? 'Nothing'}`);
 			}
 		} while (
 			!result?.match(this.OUO_PATTERN) &&
