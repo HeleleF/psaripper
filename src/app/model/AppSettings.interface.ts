@@ -10,6 +10,7 @@ export interface AppSettings {
 	linksWhitelist: string[];
 	linksBlacklist: string[];
 	downloadMethod: DownloadMethod;
+	cfCookie: string | null;
 	jdAutoStart: boolean;
 	qualities: Quality;
 	language: 'en' | 'de';

@@ -1,6 +1,6 @@
 import { app, BrowserWindow, screen, ipcMain, shell } from 'electron';
 import { IPCData } from './src/app/shared/model.interface';
-import { extractor } from './src/app/shared/extractor';
+import { ouoioExtractor, stflyExtractor } from './src/app/shared/extractor';
 import { autoUpdater } from 'electron-updater';
 import LOG from 'electron-log';
 
@@ -103,7 +103,8 @@ const createWindow = (): BrowserWindow => {
 		}
 	});
 
-	ipcMain.handle('extract', (_, data: any) => extractor.add(data));
+	//ipcMain.handle('extract', (_, data: any) => ouoioExtractor.extract(data));
+	ipcMain.handle('extract', (_, data: any) => stflyExtractor.extract(data));
 
 	return mainWindow;
 };
