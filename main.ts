@@ -103,8 +103,8 @@ const createWindow = (): BrowserWindow => {
 		}
 	});
 
-	//ipcMain.handle('extract', (_, data: any) => ouoioExtractor.extract(data));
-	ipcMain.handle('extract', (_, data: any) => stflyExtractor.extract(data));
+	ipcMain.handle('extract', (_, data: any) => ouoioExtractor.extract(data));
+	//ipcMain.handle('extract', (_, data: any) => stflyExtractor.extract(data));
 
 	return mainWindow;
 };

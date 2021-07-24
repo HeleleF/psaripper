@@ -51,7 +51,7 @@ class PSAOUOIOExtractor extends PSABaseExtractor {
 	/**
 	 * Known values for the `VstCnt` cookie that will redirect to an OUO site
 	 */
-	private ouoIndices: number[] = [8, 9, 10, 15, 16, 21, 23];
+	private ouoIndices: number[] = [4, 14, 15]; //[8, 9, 10, 15, 16, 21, 23]; // 4 und 14 müssen rein
 
 	constructor() {
 		super();
@@ -185,6 +185,9 @@ class PSAStFlyExtractor extends PSABaseExtractor {
 		const mainurl = new URL(uri);
 
 		const origin = mainurl.origin;
+
+		// bail if not stfly-like
+		// also hier ne whitelist?
 
 		// ########################################################################################
 		// # 4. post stfly link
