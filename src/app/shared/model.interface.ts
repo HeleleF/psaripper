@@ -3,15 +3,14 @@ export interface IPCData {
 	[key: string]: any;
 }
 
-export type StflyResult = Yes | No;
+export type StflyResult = StflyResultSuccess | StflyResultFail;
 
-export interface Yes {
-	success: true;
+export interface StflyResultSuccess {
+	status: 'success';
 	message: string;
 	url: string;
 }
 
-export interface No {
-	success: false;
+export interface StflyResultFail {
 	message: string;
 }

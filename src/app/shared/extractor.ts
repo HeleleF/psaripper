@@ -307,7 +307,7 @@ class PSAStFlyExtractor extends PSABaseExtractor {
 			}
 		);
 
-		if (!d5.success) {
+		if (!('status' in d5)) {
 			LOG.error(d5.message);
 			return [];
 		}
