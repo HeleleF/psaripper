@@ -44,7 +44,7 @@ export class SettingsService {
 			linksBlacklist: [],
 			downloadMethod: DownloadMethod.JD,
 			cfCookie: null,
-			ouoIndices: [7, 14, 15],
+			ouoIndices: [4, 7, 8, 14, 15],
 			jdAutoStart: true,
 			qualities: '720p',
 			language: 'en'
