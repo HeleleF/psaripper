@@ -8,14 +8,15 @@ import { ElectronService } from '../services/electron.service';
 	templateUrl: './detail.component.html',
 	styleUrls: ['./detail.component.scss']
 })
-export class DetailComponent implements OnInit, OnDestroy {
+export class DetailComponent implements OnDestroy {
 	settings: AppSettings;
+	indices: string;
 
 	constructor(private ss: SettingsService, private es: ElectronService) {
 		this.settings = this.ss.getAll();
-	}
+		this.indices = this.settings.ouoIndices.join(',');
 
-	ngOnInit(): void {}
+	}
 
 	ngOnDestroy(): void {
 		this.ss.save();
@@ -24,8 +25,13 @@ export class DetailComponent implements OnInit, OnDestroy {
 	reload(): void {}
 
 	saveD(): void {
-		console.log(this.settings);
+		console.log(this.settings.downloadMethod);
 		this.ss.update('downloadMethod', this.settings.downloadMethod);
+	}
+
+	saveIndices(): void {
+		console.log('indices', this.indices);
+		this.ss.update('ouoIndices', this.indices.split(',').map(Number));
 	}
 
 	openDev(): void {

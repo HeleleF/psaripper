@@ -49,9 +49,9 @@ abstract class PSABaseExtractor {
 		this.ax = axios.create({
 			headers: {
 				'User-Agent':
-					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36',
+					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
 				Cookie:
-					'cf_clearance=7479a3bb03f1d85b87cac17ff6f1d2bc666ca8b0-1627141513-0-150'
+					'cf_clearance=hSMrNLz6QIiq210gYow.CYufwGiHaJWMA3DA1DMbHhc-1629654903-0-150'
 			},
 			// proxy: {
 			// 	host: '127.0.0.1',

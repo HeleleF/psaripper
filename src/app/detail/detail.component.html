@@ -6,6 +6,7 @@
 		[(ngModel)]="settings.downloadMethod"
 		(change)="saveD()"
 	/>
+	<input type="text" [(ngModel)]="indices" (change)="saveIndices()" />
 </div>
 
 <button (click)="openDev()">DEV TOOLS</button>
