@@ -1,24 +1,57 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable no-console */
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 import axiosCookieJarSupport from 'axios-cookiejar-support';
 import { CookieJar, JSDOM } from 'jsdom';
 
 import { PSAMovieRelease, PSAShowRelease } from '../model/PSARelease.interface';
 import { serializeForm, btoa, delay, urljoin } from './utils';
-import { StflyResult } from './model.interface';
+import { BaseResponse, ErrorResponse, StflyResult } from './model.interface';
 import LOG from 'electron-log';
 
+export function handleAxiosError(error: AxiosError): ErrorResponse {
+	if (error.response) {
+		// The request was made and the server responded with a status code
+		// that falls out of the range of 2xx
+		LOG.error(`Recieved HTTP ${error.response.status}`);
+		LOG.verbose(error.response.data);
+		LOG.verbose(error.response.headers);
+	} else if (error.request) {
+		// The request was made but no response was received
+		// `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+		// http.ClientRequest in node.js
+		LOG.error('Request made without getting a response!');
+		LOG.verbose(error.request);
+	} else {
+		// Something happened in setting up the request that triggered an Error
+		LOG.error(`Unknown error: ${error.message}`);
+	}
+
+	const { url, data, headers, jar } = error.config;
+	LOG.verbose(
+		`##########################################################################`
+	);
+	LOG.verbose(`Request was to ${url} with ${data}`);
+	LOG.verbose('\tHeaders:', headers);
+	LOG.verbose('\tCookies:', jar);
+	LOG.verbose(
+		`##########################################################################`
+	);
+
+	return { response: null, err: true };
+}
+
 abstract class PSABaseExtractor {
-	ax: AxiosInstance;
-	cj: CookieJar;
+	protected ax: AxiosInstance;
+	protected cj: CookieJar;
 
 	constructor() {
 		this.cj = new CookieJar();
 		this.ax = axios.create({
 			headers: {
 				'User-Agent':
-					'Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15'
+					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36',
+				Cookie:
+					'cf_clearance=7479a3bb03f1d85b87cac17ff6f1d2bc666ca8b0-1627141513-0-150'
 			},
 			// proxy: {
 			// 	host: '127.0.0.1',
@@ -31,19 +64,98 @@ abstract class PSABaseExtractor {
 		this.ax.defaults.withCredentials = true;
 	}
 
+	updateSettings(settings: any) {
+		LOG.info('now using', settings);
+
+		if (settings.cfCookie) {
+			LOG.info('update cookie');
+			this.ax.defaults.headers[
+				'Cookie'
+			] = `cf_clearance=${settings.cfCookie}`;
+		}
+	}
+
+	async doGetRequest(
+		url: string,
+		config?: AxiosRequestConfig
+	): Promise<BaseResponse<string>> {
+		LOG.verbose(`GETting ${url} with config: ${config}`);
+
+		try {
+			const { data } = await this.ax.get(url, config);
+			return { response: data, err: false };
+		} catch (error) {
+			return handleAxiosError(error);
+		}
+	}
+
+	async doPostRequest(
+		url: string,
+		postData: any,
+		config?: AxiosRequestConfig
+	): Promise<BaseResponse<string>> {
+		LOG.verbose(`POSTing to ${url} with data: ${postData}`);
+
+		try {
+			const { data } = await this.ax.post(url, postData, config);
+			return { response: data, err: false };
+		} catch (error) {
+			return handleAxiosError(error);
+		}
+	}
+
 	async postForm(form: HTMLFormElement): Promise<DocumentFragment> {
-		const { data } = await this.ax.post(form.action, serializeForm(form), {
+		const url = form.action;
+		const data = serializeForm(form);
+		const config = {
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded'
 			}
-		});
+		};
 
-		return JSDOM.fragment(data);
+		const { response, err } = await this.doPostRequest(url, data, config);
+
+		if (err) {
+			return JSDOM.fragment('');
+		}
+
+		return JSDOM.fragment(response!);
 	}
 
-	abstract extract(
+	abstract extractOne(link: string): Promise<string[]>;
+
+	async extract(
 		release: PSAShowRelease | PSAMovieRelease
-	): Promise<string | string[]>;
+	): Promise<string[]> {
+		LOG.info(
+			`Adding release ${release.name} with ${release.exitLinks.length} link(s)`
+		);
+
+		const results = [];
+
+		for (const exitLink of release.exitLinks) {
+			const result = await this.extractOne(exitLink);
+
+			if (result.length) {
+				results.push(...result);
+			}
+		}
+		return results;
+	}
+
+	getFinalLinks(doc: DocumentFragment): string[] {
+		const links = Array.from(
+			doc.querySelectorAll<HTMLAnchorElement>('.entry-content a'),
+			(aTag) => aTag.href
+		);
+
+		if (links.length < 2) {
+			LOG.error('Failed to get links');
+			return [];
+		}
+
+		return links;
+	}
 }
 
 class PSAOUOIOExtractor extends PSABaseExtractor {
@@ -98,18 +210,20 @@ class PSAOUOIOExtractor extends PSABaseExtractor {
 		return result;
 	}
 
-	async try(link: string): Promise<string[]> {
+	async extractOne(link: string): Promise<string[]> {
 		const maybeOuoLink = await this.getOUORedirect(link);
 		if (!maybeOuoLink) return [];
 
 		// 1. Go to OUO.IO
-		const { data } = await this.ax.get(maybeOuoLink);
-		let doc = JSDOM.fragment(data);
+		const { response, err } = await this.doGetRequest(maybeOuoLink);
+		if (err) return [];
+
+		let doc = JSDOM.fragment(response!);
 
 		// 2. Find the first form and POST it
 		const formCaptcha = doc.querySelector<HTMLFormElement>('#form-captcha');
 		if (!formCaptcha) {
-			LOG.info('No captcha form!');
+			LOG.error('No captcha form found!');
 			return [];
 		}
 		doc = await this.postForm(formCaptcha);
@@ -117,17 +231,13 @@ class PSAOUOIOExtractor extends PSABaseExtractor {
 		// 3. Find the second form and POST it
 		const formGo = doc.querySelector<HTMLFormElement>('#form-go');
 		if (!formGo) {
-			LOG.info('No go form!');
+			LOG.error('No go form found!');
 			return [];
 		}
 		doc = await this.postForm(formGo);
 
 		// 4. Get the links
-		const links = Array.from(
-			doc.querySelectorAll<HTMLAnchorElement>('.entry-content a'),
-			(aTag) => aTag.href
-		);
-		return links;
+		return this.getFinalLinks(doc);
 	}
 
 	updateIndices(newIndices: number[]): void {
@@ -138,47 +248,17 @@ class PSAOUOIOExtractor extends PSABaseExtractor {
 		return this.ouoIndices;
 	}
 
-	async extract(
-		release: PSAShowRelease | PSAMovieRelease
-	): Promise<string[]> {
-		LOG.info(
-			`Adding release ${release.name} with ${release.exitLinks.length} link(s)`
-		);
+	updateSettings(cfg: any) {
+		super.updateSettings(cfg);
 
-		const results = [];
-
-		for (const exitLink of release.exitLinks) {
-			const result = await this.try(exitLink);
-
-			if (result.length) {
-				results.push(...result);
-			}
+		if (cfg.ouoIndices) {
+			this.updateIndices(cfg.ouoIndices);
 		}
-		return results;
 	}
 }
 
 class PSAStFlyExtractor extends PSABaseExtractor {
-	async extract(
-		release: PSAShowRelease | PSAMovieRelease
-	): Promise<string[]> {
-		LOG.info(
-			`Adding release ${release.name} with ${release.exitLinks.length} link(s)`
-		);
-
-		const results = [];
-
-		for (const exitLink of release.exitLinks) {
-			const result = await this.try(exitLink);
-
-			if (result.length) {
-				results.push(...result);
-			}
-		}
-		return results;
-	}
-
-	async try(exitLink: string): Promise<string[]> {
+	async extractOne(exitLink: string): Promise<string[]> {
 		const { data } = await this.ax.get(exitLink);
 
 		const uri = data.match(/action=(\S+)/)[1];
@@ -318,27 +398,10 @@ class PSAStFlyExtractor extends PSABaseExtractor {
 		// # 10. get from get-to.link
 		// ########################################################################################
 
-		const { data: d6 } = await this.ax.get(finalLink, {
-			headers: {
-				'User-Agent':
-					'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36',
-				Cookie:
-					'cf_clearance=a86e15bc51f14e4ff1b0f2fbff0d1fefcd853044-1626637224-0-250'
-			}
-		});
+		const { data: d6 } = await this.ax.get(finalLink);
 		const soup6 = JSDOM.fragment(d6);
 
-		const links = Array.from(
-			soup6.querySelectorAll<HTMLAnchorElement>('.entry-content a'),
-			(aTag) => aTag.href
-		);
-
-		if (links.length < 2) {
-			LOG.error('Failed to get links');
-			return [];
-		}
-
-		return links;
+		return this.getFinalLinks(soup6);
 	}
 }
 

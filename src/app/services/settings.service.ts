@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AppSettings, DownloadMethod } from '../model/AppSettings.interface';
+import { ElectronService } from './electron.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -8,7 +9,7 @@ export class SettingsService {
 	private cfg: AppSettings;
 	private readonly SETTINGS_KEY = 'userData';
 
-	constructor() {
+	constructor(private es: ElectronService) {
 		const data = localStorage.getItem(this.SETTINGS_KEY);
 		const defaultData = this.defaultUserData;
 
@@ -23,6 +24,13 @@ export class SettingsService {
 			...defaultData,
 			...JSON.parse(data)
 		};
+
+		console.log('df', JSON.stringify(this.cfg));
+
+		this.es.sendMessage({
+			command: 'settings',
+			settings: this.cfg
+		});
 	}
 
 	getAll(): AppSettings {
@@ -30,11 +38,13 @@ export class SettingsService {
 	}
 
 	private get defaultUserData(): AppSettings {
+		console.log('tetds');
 		return {
 			linksWhitelist: ['https://mega.nz'],
 			linksBlacklist: [],
 			downloadMethod: DownloadMethod.JD,
 			cfCookie: null,
+			ouoIndices: [7, 14, 15],
 			jdAutoStart: true,
 			qualities: '720p',
 			language: 'en'
@@ -43,6 +53,10 @@ export class SettingsService {
 
 	save(): void {
 		localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(this.cfg));
+		this.es.sendMessage({
+			command: 'settings',
+			settings: this.cfg
+		});
 	}
 
 	get<K extends keyof AppSettings>(key: K): AppSettings[K] {

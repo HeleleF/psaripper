@@ -41,8 +41,6 @@ export class PsaContentComponent implements OnInit {
 				// popup instant zu machen ist blöd, fehlermeldung anzeigen?
 			}
 		});
-
-		console.log('sdasdasd');
 	}
 
 	closeModal(): void {

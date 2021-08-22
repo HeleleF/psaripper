@@ -11,6 +11,7 @@ export interface AppSettings {
 	linksBlacklist: string[];
 	downloadMethod: DownloadMethod;
 	cfCookie: string | null;
+	ouoIndices: number[];
 	jdAutoStart: boolean;
 	qualities: Quality;
 	language: 'en' | 'de';

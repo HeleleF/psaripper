@@ -97,6 +97,10 @@ const createWindow = (): BrowserWindow => {
 				mainWindow?.close();
 				break;
 
+			case 'settings':
+				ouoioExtractor.updateSettings(data.settings);
+				break;
+
 			default:
 				LOG.warn(`Recieved unknown command "${data.command}"`);
 				break;
@@ -116,6 +120,7 @@ if (!instanceLock) {
 		createWindow();
 		autoUpdater.checkForUpdatesAndNotify();
 	});
+
 	app.on('second-instance', () => {
 		if (mainWindow?.isMinimized()) mainWindow.restore();
 		mainWindow?.focus();
